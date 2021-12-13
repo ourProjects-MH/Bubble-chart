@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app"
 import { getFirestore } from "firebase/firestore"
-import { collection, addDoc, getDocs } from "firebase/firestore";
-
+// import { collection,  addDoc } from "firebase/firestore";
+import { getDoc, doc } from "firebase/firestore";
 initializeApp({
   apiKey: "AIzaSyCKZQz6LPTVvBzbG4gWiFW_mv_A-Gvqo7k",
   authDomain: "bubble-chart-89dd0.firebaseapp.com",
@@ -13,19 +13,34 @@ initializeApp({
 });
 
 const db = getFirestore();
-try {
-  const docRef = addDoc(collection(db, "test2"), {
-    first: {
-      word: "mj",
-      count: 5,
-    }
-  });
-  console.log("Document written with ID: ", docRef.id);
-} catch (e) {
-  console.error("Error adding document: ", e);
-}
+// function setData() {
+//   try {
+//     const docRef = setDoc(doc(db, "test2", "data"), {
+//       word1: {
+//         "내일 뭐먹지": 1,
+//         "혜은이는": 2,
+//         "오늘": 3,
+//         "간다": 5,
+//         "낼 넘 외로울 것 같다 흑흑": 5,
+//       },
+//       word2: {
+//         "내일 뭐먹지": 1,
+//         "혜은이는": 2,
+//         "오늘": 3,
+//         "간다": 4,
+//         "낼 넘 외로울 것 같다 흑흑": 5,
+//       }
+//     });
+//     console.log("Document written with ID: ", docRef.id);
+//   } catch (e) {
+//     console.error("Error adding document: ", e);
+//   }
+// }
 
-const querySnapshot = getDocs(collection(db, "test2"));
-querySnapshot.forEach((doc) => {
-  console.log(doc.data());
-});
+// GET
+const docRef = doc(db, "test2", "data");
+getDoc(docRef).then((res) => console.log(res.metadata));
+
+
+// const docSnap = getDoc(docRef);
+// console.log(docSnap.data.th)
