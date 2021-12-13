@@ -1,11 +1,8 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// import * as firebase from 'firebase/app'
-// import 'firebase/firestore';
-// import { getFirestore, collection } from 'firebase/firestore/lite';
-import * as firestore from 'firebase/firestore'
+import { initializeApp } from "firebase/app"
+import { getFirestore } from "firebase/firestore"
+import { collection, addDoc, getDocs } from "firebase/firestore";
 
-const firebaseConfig = {
+initializeApp({
   apiKey: "AIzaSyCKZQz6LPTVvBzbG4gWiFW_mv_A-Gvqo7k",
   authDomain: "bubble-chart-89dd0.firebaseapp.com",
   projectId: "bubble-chart-89dd0",
@@ -13,24 +10,22 @@ const firebaseConfig = {
   messagingSenderId: "931764363139",
   appId: "1:931764363139:web:178bbd4673864d589660b6",
   measurementId: "${config.measurementId}"
-};
+});
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = firestore.getFirestore(app);
-const citiesCol = firestore.collection(db, 'test2');
-// const citySnapshot = getDocs(citiesCol);
-console.log(citiesCol)
-// Get a list of cities from your database
-// async function getCities(db) {
-//   const citiesCol = collection(db, 'cities');
-//   const citySnapshot = await getDocs(citiesCol);
-//   const cityList = citySnapshot.docs.map(doc => doc.data());
-//   return cityList;
-// }
-// const app = initializeApp(firebaseConfig);
-// firebase.initializeApp(firebaseConfig)
+const db = getFirestore();
+try {
+  const docRef = addDoc(collection(db, "test2"), {
+    first: {
+      word: "mj",
+      count: 5,
+    }
+  });
+  console.log("Document written with ID: ", docRef.id);
+} catch (e) {
+  console.error("Error adding document: ", e);
+}
 
-// firebase.firestore().collection('test').add({test:'aaa'})
-//   .then(r => console.log(r))
-//   .catch(e => console.error(e))
+const querySnapshot = getDocs(collection(db, "test2"));
+querySnapshot.forEach((doc) => {
+  console.log(doc.data());
+});
