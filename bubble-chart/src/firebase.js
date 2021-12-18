@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app"
-import { getFirestore, setDoc } from "firebase/firestore"
+import { getFirestore, addDoc, collection } from "firebase/firestore"
 // import { collection,  addDoc } from "firebase/firestore";
-import { getDoc, doc } from "firebase/firestore";
+// import { doc } from "firebase/firestore";
 initializeApp({
   apiKey: "AIzaSyCKZQz6LPTVvBzbG4gWiFW_mv_A-Gvqo7k",
   authDomain: "bubble-chart-89dd0.firebaseapp.com",
@@ -22,15 +22,41 @@ const db = getFirestore();
 // console.log(docSnap.data.th)
 
 // 버블개수, 버블 키워드 받은 것 기준으로 데이터 넣는 함수
-function setData(bubbleCount, keywordList) {
-  keywordList.forEach(element => {
-    setDoc(doc(db, "test2", "data"), {
-      element: {
+// function setData(bubbleCount, keywordList) {
+//   for (let i=0; i<keywordList.length; i++) {
+//     let object = new Object()
+//     let word1 = keywordList[i]
+//     const content = {
+//         "test": 1,
+//         "test2": 2,
+//     }
+//     object[word1] = content
+//     addDoc(doc(db, "test2", "data"), object);
+//   }
+//   // keywordList.forEach(element => {
+//   //   const content = {
+//   //     element: {
+//   //       "test": 1,
+//   //       "test2": 2,
+//   //     }
+//   //   }
+//   //   setDoc(doc(db, "test2", "data"), content);
+//   // });
+// }
+
+
+// 데이터 추가 함수
+function addData(bubbleCount, keywordList) {
+  for (let i=0; i<keywordList.length; i++) {
+    let object = new Object()
+    let word1 = keywordList[i]
+    const content = {
         "test": 1,
         "test2": 2,
-      }
-    });
-  });
+    }
+    object[word1] = content
+    addFi
+    addDoc(collection(db, "test2", "data", "부서"), object);
+  }
 }
-
-setData(5, ['업무', '조직', '팀', '실장', '부서'])
+addData(5, ['업무', '조직', '팀', '실장', '부서'])
