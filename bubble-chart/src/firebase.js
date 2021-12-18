@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app"
-import { getFirestore } from "firebase/firestore"
+import { getFirestore, setDoc } from "firebase/firestore"
 // import { collection,  addDoc } from "firebase/firestore";
 import { getDoc, doc } from "firebase/firestore";
 initializeApp({
@@ -13,34 +13,24 @@ initializeApp({
 });
 
 const db = getFirestore();
-// function setData() {
-//   try {
-//     const docRef = setDoc(doc(db, "test2", "data"), {
-//       word1: {
-//         "내일 뭐먹지": 1,
-//         "혜은이는": 2,
-//         "오늘": 3,
-//         "간다": 5,
-//         "낼 넘 외로울 것 같다 흑흑": 5,
-//       },
-//       word2: {
-//         "내일 뭐먹지": 1,
-//         "혜은이는": 2,
-//         "오늘": 3,
-//         "간다": 4,
-//         "낼 넘 외로울 것 같다 흑흑": 5,
-//       }
-//     });
-//     console.log("Document written with ID: ", docRef.id);
-//   } catch (e) {
-//     console.error("Error adding document: ", e);
-//   }
-// }
-
 // GET
-const docRef = doc(db, "test2", "data");
-getDoc(docRef).then((res) => console.log(res.metadata));
+// const docRef = doc(db, "test2", "data");
+// getDoc(docRef).then((res) => console.log(res.metadata));
 
 
 // const docSnap = getDoc(docRef);
 // console.log(docSnap.data.th)
+
+// 버블개수, 버블 키워드 받은 것 기준으로 데이터 넣는 함수
+function setData(bubbleCount, keywordList) {
+  keywordList.forEach(element => {
+    setDoc(doc(db, "test2", "data"), {
+      element: {
+        "test": 1,
+        "test2": 2,
+      }
+    });
+  });
+}
+
+setData(5, ['업무', '조직', '팀', '실장', '부서'])
