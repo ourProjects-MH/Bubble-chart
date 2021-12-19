@@ -46,17 +46,29 @@ const db = getFirestore();
 
 
 // 데이터 추가 함수
+// 계급, 키워드리스트, 문구,
 function addData(bubbleCount, keywordList) {
+  
   for (let i=0; i<keywordList.length; i++) {
     let object = new Object()
     let word1 = keywordList[i]
-    const content = {
-        "test": 1,
-        "test2": 2,
+
+    let content = {
+      "total_count": 24,
+      "sentence": [
+        {
+          "hihi": 1
+        },
+        {
+          "byebye": 2
+        }
+      ]
     }
-    object[word1] = content
-    addFi
-    addDoc(collection(db, "test2", "data", "부서"), object);
+    content[word1] = 
+    // object[word1] = content
+    addDoc(collection(db, "test3"), object);
   }
 }
-addData(5, ['업무', '조직', '팀', '실장', '부서'])
+addData("임원", [{'업무': [{"hi": 1}, {"hihi": 2}]}, '조직', '팀', '실장', '부서'])
+
+// 카운트 수정 api
