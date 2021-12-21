@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app"
-import { getFirestore, addDoc, collection } from "firebase/firestore"
+import { getFirestore, setDoc} from "firebase/firestore"
 // import { collection,  addDoc } from "firebase/firestore";
-// import { doc } from "firebase/firestore";
+import { doc } from "firebase/firestore";
 initializeApp({
   apiKey: "AIzaSyCKZQz6LPTVvBzbG4gWiFW_mv_A-Gvqo7k",
   authDomain: "bubble-chart-89dd0.firebaseapp.com",
@@ -47,28 +47,49 @@ const db = getFirestore();
 
 // 데이터 추가 함수
 // 계급, 키워드리스트, 문구,
-function addData(bubbleCount, keywordList) {
+// function addData(bubbleCount, keywordList) {
   
-  for (let i=0; i<keywordList.length; i++) {
-    let object = new Object()
-    let word1 = keywordList[i]
+//   for (let i=0; i<keywordList.length; i++) {
+//     let object = new Object()
+//     let word1 = keywordList[i]
 
-    let content = {
-      "total_count": 24,
-      "sentence": [
-        {
-          "hihi": 1
-        },
-        {
-          "byebye": 2
-        }
-      ]
-    }
-    content[word1] = 
-    // object[word1] = content
-    addDoc(collection(db, "test3"), object);
-  }
-}
-addData("임원", [{'업무': [{"hi": 1}, {"hihi": 2}]}, '조직', '팀', '실장', '부서'])
+//     let content = {
+//       "total_count": 24,
+//       "sentence": [
+//         {
+//           "hihi": 1
+//         },
+//         {
+//           "byebye": 2
+//         }
+//       ]
+//     }
+//     content[word1] = 
+//     // object[word1] = content
+//     addDoc(collection(db, "test3"), object);
+//   }
+// }
+// addData("임원", [{'업무': [{"hi": 1}, {"hihi": 2}]}, '조직', '팀', '실장', '부서'])
 
 // 카운트 수정 api
+
+// 초기 데이터 추가
+function setData(group, keyword, sentences) {
+  let object = new Object()
+  for (let i=0; i < sentences.length; i++) {
+    object[i] = {
+      "sentence": sentences[i],
+      "count": 0,
+    }
+  }
+  
+  setDoc(doc(db, group, keyword), object)
+}
+
+setData("임원", "팀플", ["어려워요", "재미있어요", "꺌꺌꺌"])
+setData("임원", "분담", ["짜릿해요", "호로록", "꺄르륵"])
+
+// 데이터 반환
+function getTotalData() {
+  
+}
