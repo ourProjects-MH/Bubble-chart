@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app"
-import { getFirestore, setDoc} from "firebase/firestore"
+import {  getFirestore, setDoc, getDocs, collection } from "firebase/firestore"
 // import { collection,  addDoc } from "firebase/firestore";
 import { doc } from "firebase/firestore";
 initializeApp({
@@ -75,21 +75,63 @@ const db = getFirestore();
 
 // 초기 데이터 추가
 function setData(group, keyword, sentences) {
-  let object = new Object()
+  let data = new Object()
   for (let i=0; i < sentences.length; i++) {
-    object[i] = {
+    data[i] = {
       "sentence": sentences[i],
       "count": 0,
     }
   }
   
-  setDoc(doc(db, group, keyword), object)
+  setDoc(doc(db, group, keyword), data)
 }
-
 setData("임원", "팀플", ["어려워요", "재미있어요", "꺌꺌꺌"])
 setData("임원", "분담", ["짜릿해요", "호로록", "꺄르륵"])
+setData("팀원", "업무", ["힘들어요", "뭔소린지", "모르겠어요"])
 
 // 데이터 반환
+// 컬렉션 즉 그룹이 뭔지 알아야함
 function getTotalData() {
-  
+  let result = new Object()
+
+  const collections = getDocs(collection(db, "임원"))
+  result["임원"] = new Object()
+
+  collections.then((res) => {
+    let docsInCollection = res._snapshot.docChanges
+    
+    // 해당 그룹안에 있는 docs(키워드) 순회
+    for(let i=0; i< docsInCollection.length; i++) {
+      let path = docsInCollection[i].doc.key.path.segments
+      let keyword = path[path.length-1]
+      result["임원"][keyword] = new Object()
+
+      let sentences = docsInCollection[i].doc.data.value.mapValue.fields
+      sentences = Object.entries(sentences)
+
+      // 키워드 안의 문구 순회
+      for (let j=0; j<sentences.length; j++) {
+        let count = sentences[j][1].mapValue.fields.count.integerValue
+        let sentence = sentences[j][1].mapValue.fields.sentence.stringValue
+        result["임원"][keyword][sentence] = count
+      }
+    }
+    console.log(result)
+  })
+  return result
 }
+getTotalData()
+
+// function setData(group, keyword, sentences) {
+//   let data = new Object()
+//   data[keyword] = new Object()
+//   data[keyword]["sentences"] = new Object()
+//   for (let i=0; i < sentences.length; i++) {
+//     data[keyword]["sentences"][i] = {
+//       "sentence": sentences[i],
+//       "count": 0,
+//     }
+//   }
+  
+//   setDoc(doc(db, "data", group), data)
+// }
