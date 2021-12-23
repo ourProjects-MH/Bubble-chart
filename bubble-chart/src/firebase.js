@@ -37,20 +37,22 @@ setData("팀원", "업무", ["힘들어요", "뭔소린지", "모르겠어요"],
 // 컬렉션 즉 그룹이 뭔지 알아야함
 function getTotalData() {
   let result = new Object()
-  // let groups = getGroups()
-  // groups = new Set(groups)
+  let groups = getGroups()
+  console.log(groups[0], Object.values(getGroups()))
   // 그룹 순회하며 하나씩 가져오기
+  for (let g=0; g<groups.length; g++) {
+    console.log(groups[g])
+  }
   const collections = getDocs(collection(db, "임원"))
   result = {}
 
   collections.then((res) => {
     let docsInCollection = res._snapshot.docChanges
-    console.log(docsInCollection)
     // 해당 그룹안에 있는 docs(키워드) 순회
     for(let i=0; i< docsInCollection.length; i++) {
       let path = docsInCollection[i].doc.key.path.segments
       let keyword = path[path.length-1]
-      console.log(keyword)
+
       result[keyword] = {}
       result[keyword]["sentences"] = []
 
@@ -59,13 +61,12 @@ function getTotalData() {
 
       sentences = Object.entries(sentences)
       
-      for (let j=0; j<sentences.length; j++) {
+      for (let j=0; j<sentences.length-1; j++) {
         let sub = {}
-        console.log(sentences)
         let countValue = sentences[j][1].mapValue.fields.count.integerValue
         let group = sentences[j][1].mapValue.fields.group.stringValue
         let sentence = sentences[j][1].mapValue.fields.sentence.stringValue
-        console.log(countValue, group, sentence)
+
         sub["sentence"] = sentence
         sub["group"] = group
         sub["count"] = countValue
@@ -85,23 +86,22 @@ function addGroups (group) {
 }
 addGroups("임원")
 addGroups("팀원")
-// 계급 가져오는 api
+
+// 그룹 가져오는 api
 function getGroups() {
   let groups = []
   const collections = getDocs(collection(db, "Groups"))
   collections.then((res) => {
     let docsInCollection = res._snapshot.docChanges
-    
+
     // 해당 그룹안에 있는 docs(키워드) 순회
     for(let i=0; i< docsInCollection.length; i++) {
-      let path = docsInCollection[i].doc.key.path.segments
-      let keyword = path[path.length-1]
-      groups.push(keyword)
+      let groupName = docsInCollection[i].doc.data.value.mapValue.fields.groupName.stringValue
+      groups.push(groupName)
     }
   })
   return groups
 }
-console.log(getGroups())
 // 버블차트 데이터 저장 api
 function setBubblechartData(keyword, sentences, count) {
   let arrayData = {}
