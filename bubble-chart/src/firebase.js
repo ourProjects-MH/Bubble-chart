@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app"
-import {  getFirestore, setDoc, getDocs, collection } from "firebase/firestore"
+import {  getFirestore, setDoc, getDocs, collection, getDoc } from "firebase/firestore"
 // import { collection,  addDoc } from "firebase/firestore";
 import { doc } from "firebase/firestore";
 initializeApp({
@@ -14,7 +14,7 @@ initializeApp({
 
 const db = getFirestore();
 
-// 초기 데이터 추가
+// 데이터 추가
 function setData(group, keyword, sentences, totalCount) {
   let data = new Object()
   data["totalCount"] = totalCount
@@ -29,16 +29,12 @@ function setData(group, keyword, sentences, totalCount) {
   
   setDoc(doc(db, group, keyword), data)
 }
-setData("임원", "팀플", ["어려워요", "재미있어요", "꺌꺌꺌"], 30)
-setData("임원", "분담", ["짜릿해요", "호로록", "꺄르륵"], 30)
-setData("팀원", "업무", ["힘들어요", "뭔소린지", "모르겠어요"], 30)
 
 // 데이터 반환
-// 컬렉션 즉 그룹이 뭔지 알아야함
 function getTotalData() {
   let result = new Object()
   let groups = getGroups()
-  console.log(groups[0], Object.values(getGroups()))
+  console.log(groups)
   // 그룹 순회하며 하나씩 가져오기
   for (let g=0; g<groups.length; g++) {
     console.log(groups[g])
@@ -70,7 +66,7 @@ function getTotalData() {
         sub["sentence"] = sentence
         sub["group"] = group
         sub["count"] = countValue
-
+        sub["id"] = j
         result[keyword]["sentences"].push(sub)
       }
         
@@ -78,14 +74,11 @@ function getTotalData() {
   })
   return result
 }
-console.log("getTotalData", getTotalData())
 
 // 그룹 데이터 저장
 function addGroups (group) {
   setDoc(doc(db, "Groups", group), {"groupName": group})
 }
-addGroups("임원")
-addGroups("팀원")
 
 // 그룹 가져오는 api
 function getGroups() {
@@ -102,6 +95,7 @@ function getGroups() {
   })
   return groups
 }
+
 // 버블차트 데이터 저장 api
 function setBubblechartData(keyword, sentences, count) {
   let arrayData = {}
@@ -145,23 +139,49 @@ function getBubblechartData() {
   })
   return result
 }
+
+// 카운트 수정 api
+function putCount(group, keyword, sentenceId) {
+  console.log("들와따")
+  const findDoc = getDoc(collection(db, "임원"));
+  findDoc.then((res) => {
+    let docsInCollection = res._snapshot.docChanges
+    console.log("hihi")
+    console.log(docsInCollection)
+    console.log(keyword, sentenceId)
+  })
+  // console.log(findDoc)
+  // let putData = new Object()
+  // putData[sentenceId] = {
+  //   count: 100,
+  //   "sentence": sentence
+  // }
+  // try {
+  //   updateDoc(findDoc, putData)
+  // } catch (e) {
+  //   console.log(e)
+  // }
+}
+
+
+// 함수 실행
+// setData(group, keyword, sentences, totalCount)
+setData("임원", "팀플", ["어려워요", "재미있어요", "꺌꺌꺌"], 30)
+setData("임원", "분담", ["짜릿해요", "호로록", "꺄르륵"], 30)
+setData("팀원", "업무", ["힘들어요", "뭔소린지", "모르겠어요"], 30)
+
+console.log("getTotalData", getTotalData())
+
+// addGroups (group)
+addGroups("임원")
+addGroups("팀원")
+
+// 버블차트 데이터
 setBubblechartData("keyword", ["sentence1", "sentence2", "sentence3"], [20, 20, 20])
 setBubblechartData("하이하이", ["짜릿해요", "호로록", "꺄르륵"], [20, 20, 20])
 getBubblechartData()
-// 카운트 수정 api
-// function putCount(group, keyword, sentenceIdx, sentence) {
-//   const findDoc = doc(db, group, keyword);
-//   console.log(findDoc)
-//   let putData = new Object()
-//   putData[sentenceIdx] = {
-//     count: 100,
-//     "sentence": sentence
-//   }
-//   try {
-//     updateDoc(findDoc, putData)
-//   } catch (e) {
-//     console.log(e)
-//   }
+
+putCount("임원", "분담", 0)
   
 // }
 // putCount("임원", "팀플", 0, "짜릿해요")
