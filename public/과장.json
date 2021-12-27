@@ -1,0 +1,30 @@
+{
+  "work": 
+    { "sentences" : 
+      [
+        { "과장_hihi": 1 },
+        { "과장_byebye": 2 } 
+      ]
+    },
+  "human1": 
+    { "sentences" : 
+      [
+        { "과장_hihi": 1 },
+        { "과장_byebye": 2 } 
+      ]
+    },
+  "time": 
+    { "sentences" : 
+      [
+        { "과장_hihi": 1 },
+        { "과장_byebye": 2 } 
+      ]
+    },
+  "else" : 
+    { "sentences" : 
+      [
+        { "과장_hihi": 1 },
+        { "과장_byebye": 2 } 
+      ]
+    }
+}
