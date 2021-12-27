@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app"
-import {  getFirestore, setDoc, getDocs, collection, getDoc, updateDoc } from "firebase/firestore"
+import {  getFirestore, setDoc, getDocs, collection} from "firebase/firestore"
 // import { collection,  addDoc } from "firebase/firestore";
 import { doc } from "firebase/firestore";
 initializeApp({
@@ -34,8 +34,6 @@ function setData(group, keyword, sentences, totalCount) {
 function getTotalData() {
   let result = new Object()
   let groups = getGroups()
-  console.log(groups, typeof(groups), Object.keys(groups))
-  console.log(Object.entries(groups))
 
   // 그룹 순회하며 하나씩 가져오기
   for (let g=0; g<groups.length; g++) {
@@ -144,34 +142,34 @@ function getBubblechartData() {
 }
 
 // 카운트 수정
-function updateCount(group, keyword, sentenceId) {
-  // console.log(doc(db, group, keyword))
-  let a = getDocs(collection(db, group))
-  a.then((res) => {
-    console.log("++", res)
-  })
+// function updateCount(group, keyword, sentenceId) {
+//   // console.log(doc(db, group, keyword))
+//   let a = getDocs(collection(db, group))
+//   a.then((res) => {
+//     console.log("++", res)
+//   })
 
-  const findDoc = getDoc(doc(db, group, keyword))
-  let changeContent = new Object()
-  changeContent[sentenceId] = new Object()
+//   const findDoc = getDoc(doc(db, group, keyword))
+//   let changeContent = new Object()
+//   changeContent[sentenceId] = new Object()
 
-  // console.log(findDoc)
-  findDoc.then((res) => {
-    console.log(res)
-    // let docsInCollection = res._document.data.value.mapValue.fields.values()
-    // console.log(docsInCollection)
-    // // let docToModify = docsInCollection[sentenceId].mapValue.fields
-    // console.log("+++", docsInCollection)
-    // changeContent[sentenceId]["group"] = docToModify["group"]
-    // changeContent[sentenceId]["sentence"] = docToModify["sentence"]
-    // changeContent[sentenceId]["count"] = docToModify["count"]
-    // console.log(changeContent, docToModify["group"])
-    // changeContent[sentenceId]["count"]["integerValue"] = (parseInt(docToModify["count"].integerValue) + 1).toString()
-  })
-  updateDoc(doc(db, group, keyword), changeContent)
+//   // console.log(findDoc)
+//   findDoc.then((res) => {
+//     console.log(res)
+//     // let docsInCollection = res._document.data.value.mapValue.fields.values()
+//     // console.log(docsInCollection)
+//     // // let docToModify = docsInCollection[sentenceId].mapValue.fields
+//     // console.log("+++", docsInCollection)
+//     // changeContent[sentenceId]["group"] = docToModify["group"]
+//     // changeContent[sentenceId]["sentence"] = docToModify["sentence"]
+//     // changeContent[sentenceId]["count"] = docToModify["count"]
+//     // console.log(changeContent, docToModify["group"])
+//     // changeContent[sentenceId]["count"]["integerValue"] = (parseInt(docToModify["count"].integerValue) + 1).toString()
+//   })
+//   updateDoc(doc(db, group, keyword), changeContent)
   
-  console.log(group, keyword, sentenceId)
-}
+//   console.log(group, keyword, sentenceId)
+// }
 
 // 키워드 삭제 api
 // function deleteKeyword(group, keyword) {
@@ -220,8 +218,8 @@ getBubblechartData()
 // deleteKeyword("임원", "팀플")
 
 // 카운트 수정
-updateCount("임원", "분담", 0)
-updateCount("임원", "분담", 0)
+// updateCount("임원", "분담", 0)
+// updateCount("임원", "분담", 0)
 
 // function setTotalData(id, group, keyword, sentenceList, totalCount) {
 //   // collection: data, doc: id, 필드안에 다 넣기
