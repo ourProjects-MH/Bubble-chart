@@ -1,7 +1,7 @@
 <template>
   <div>
     <div id="chart" class="chart"></div>
-    <SentenceModal v-if="openModal" :dialog="openModal"/>
+    <SentenceModal :dialog="openModal" :selected_keyword="selected_keyword" :selected_sentences="selected_sentences" v-on:changeModal="changeModal" />
   </div>
 </template>
 
@@ -13,7 +13,7 @@ export default {
   name: "Bubble",
   data() {
     return {
-      openModal: false, 
+      openModal: false,
       selected_keyword: null,
       selected_sentences: null,
     }
@@ -23,7 +23,7 @@ export default {
       handler() {
         this.make_bubble()
       },
-    }
+    },
   },
   computed: {
   },
@@ -49,8 +49,6 @@ export default {
       var json = { 'children': this.children.slice(0) }
       // name(string), sentences(array), value(int)
 
-  
-      console.log('make bubble')
       const values = json.children.map(d => d.value);
 
       const min = Math.min.apply(null, values);
@@ -81,10 +79,10 @@ export default {
         .attr('transform', function(d) { return 'translate(' + d.x + ' ' + d.y + ')'; })
         .append('g');
 
+      var vm = this;
+
       node.append("circle")
         .attr("r", function(d) { return d.r; })
-        .attr("cursor", "pointer")
-        .attr("class", function(d) { return d.data.name; })
         .on("click", getSentences)
         .style("fill", getItemColor)
 
@@ -133,12 +131,14 @@ export default {
         return '#' + colorList[i];
       }
       function getSentences(item) {
-        this.selected_keyword= item["target"]["__data__"]["data"]["name"]
-        this.selected_sentences = item["target"]["__data__"]["data"]["sentences"]
-        this.openModal = true 
-        console.log(this.selected_keyword, this.selected_sentences, this.openModal)
+        vm.selected_keyword= item["target"]["__data__"]["data"]["name"]
+        vm.selected_sentences = item["target"]["__data__"]["data"]["sentences"]
+        vm.changeModal()
       }
     },
+    changeModal() {
+      this.openModal = !this.openModal
+    }
   }
 }
 </script>
@@ -156,11 +156,11 @@ export default {
 }
 .node circle {
   transition: transform 200ms ease-in-out;
-
 }
 .node:hover circle {
   transform: scale(1.1);
   filter: brightness(50%);
+  cursor: pointer;
 }
 
 
