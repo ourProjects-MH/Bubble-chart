@@ -31,20 +31,16 @@ function setData(group, keyword, sentences, totalCount) {
 }
 
 // 데이터 반환
-function getTotalData() {
-  let result = new Object()
-  let groups = getGroups()
-
+async function getTotalData() {
+  let groupNameList = await getGroups()
+  let result = {}
+  
   // 그룹 순회하며 하나씩 가져오기
-  for (let g=0; g<groups.length; g++) {
-    console.log(groups[g])
-  }
-  const collections = getDocs(collection(db, "임원"))
-  result = {}
-
-  collections.then((res) => {
-    let docsInCollection = res._snapshot.docChanges
-    // 해당 그룹안에 있는 docs(키워드) 순회
+  for (let i in groupNameList) {
+    const collections = await getDocs(collection(db, groupNameList[i]))
+    
+    let docsInCollection = collections._snapshot.docChanges
+      // 해당 그룹안에 있는 docs(키워드) 순회
     for(let i=0; i< docsInCollection.length; i++) {
       let path = docsInCollection[i].doc.key.path.segments
       let keyword = path[path.length-1]
@@ -69,9 +65,9 @@ function getTotalData() {
         sub["id"] = j
         result[keyword]["sentences"].push(sub)
       }
-        
+      console.log("=====", result)
     }
-  })
+  }
   return result
 }
 
@@ -81,19 +77,17 @@ function addGroups (group) {
 }
 
 // 그룹 가져오는 api
-function getGroups() {
-  let groups = new Array()
-  const collections = getDocs(collection(db, "Groups"))
-  collections.then((res) => {
-    let docsInCollection = res._snapshot.docChanges
+async function getGroups() {
+  let groups = {}
+  const collections = await getDocs(collection(db, "Groups"))
 
-    // 해당 그룹안에 있는 docs(키워드) 순회
-    for(let i=0; i< docsInCollection.length; i++) {
-      let groupName = docsInCollection[i].doc.data.value.mapValue.fields.groupName.stringValue
-      groups.push(groupName)
-    }
-  })
-  console.log("==", groups)
+  let docsInCollection = collections._snapshot.docChanges
+
+  // 해당 그룹안에 있는 docs(키워드) 순회
+  for(let i=0; i< docsInCollection.length; i++) {
+    let groupName = docsInCollection[i].doc.data.value.mapValue.fields.groupName.stringValue
+    groups[i] = groupName
+  }
   return groups
 }
 
@@ -203,11 +197,12 @@ setData("임원", "팀플", ["어려워요", "재미있어요", "꺌꺌꺌"], 30
 setData("임원", "분담", ["짜릿해요", "호로록", "꺄르륵"], 30)
 setData("팀원", "업무", ["힘들어요", "뭔소린지", "모르겠어요"], 30)
 
-console.log("getTotalData", getTotalData())
-
-// addGroups (group)
 addGroups("임원")
 addGroups("팀원")
+
+getTotalData().then((res => {
+  console.log(res)
+}))
 
 // 버블차트 데이터
 setBubblechartData("keyword", ["sentence1", "sentence2", "sentence3"], [20, 20, 20])
