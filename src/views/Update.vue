@@ -1,6 +1,23 @@
 <template>
   <div id="app" class="container">
     <h1>Data Collections</h1>
+    <div class="group-section">
+      <input 
+        v-model="group1" 
+        type="text" 
+        class="form-control" 
+        placeholder="Group1">
+      <input 
+        v-model="group2" 
+        type="text" 
+        class="form-control" 
+        placeholder="Group2">
+      <input 
+        v-model="group3" 
+        type="text" 
+        class="form-control" 
+        placeholder="Group3">
+    </div>
     <div class="section">
       <div class="data" v-for="(data, idx) in data_collections" :key="idx">
         <div class="idx">{{ idx+1 }}.</div>
@@ -148,6 +165,10 @@ export default {
   margin: 0.2rem;
 }
 .section {
+  border-bottom: 2px solid rgb(61, 63, 65);
+  margin: 3rem;
+}
+.group-section {
   border-bottom: 2px solid rgb(61, 63, 65);
   margin: 3rem;
 }

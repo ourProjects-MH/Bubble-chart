@@ -17,6 +17,48 @@ initializeApp({
 
 const db = getFirestore();
 
+
+export default {
+  getTotalData: async function() {
+    let groupNameList = await getGroups()
+    let result = {}
+    
+    // 그룹 순회하며 하나씩 가져오기
+    for (let i in groupNameList) {
+      const collections = await getDocs(collection(db, groupNameList[i]))
+      
+      let docsInCollection = collections._snapshot.docChanges
+        // 해당 그룹안에 있는 docs(키워드) 순회
+      for(let i=0; i< docsInCollection.length; i++) {
+        let path = docsInCollection[i].doc.key.path.segments
+        let keyword = path[path.length-1]
+  
+        result[keyword] = {}
+        result[keyword]["sentences"] = []
+  
+        let sentences = docsInCollection[i].doc.data.value.mapValue.fields
+        result[keyword]["totalCount"] = sentences.totalCount.integerValue
+  
+        sentences = Object.entries(sentences)
+        
+        for (let j=0; j<sentences.length-1; j++) {
+          let sub = {}
+          let countValue = sentences[j][1].mapValue.fields.count.integerValue
+          let group = sentences[j][1].mapValue.fields.group.stringValue
+          let sentence = sentences[j][1].mapValue.fields.sentence.stringValue
+  
+          sub["sentence"] = sentence
+          sub["group"] = group
+          sub["count"] = countValue
+          sub["id"] = j
+          result[keyword]["sentences"].push(sub)
+        }
+        console.log("=====", result)
+      }
+    }
+    return result
+  }
+}
 // 비밀번호 저장/가져오는 api
 
 // 데이터 추가
