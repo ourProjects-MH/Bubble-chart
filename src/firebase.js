@@ -177,7 +177,7 @@ function updateCount(group, keyword, sentenceId, countNumber) {
 
 // 카운트 수정
 updateCount("임원", "분담", 2, 1)
-
+updateCount("임원", "팀플", 2, 1)
 
 
 
