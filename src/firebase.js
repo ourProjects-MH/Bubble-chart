@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app"
 import {  getFirestore, increment } from "firebase/firestore"
-// import {  getDocs, collection } from "firebase/firestore"
+import {  getDocs, collection } from "firebase/firestore"
 import {  doc } from "firebase/firestore"
 // import {  setDoc } from "firebase/firestore"
 // import { collection,  addDoc } from "firebase/firestore";
@@ -57,6 +57,44 @@ export default {
       }
     }
     return result
+  },
+  getGroups:async function() {
+    let groups = {}
+    const collections = await getDocs(collection(db, "Groups"))
+  
+    let docsInCollection = collections._snapshot.docChanges
+  
+    // 해당 그룹안에 있는 docs(키워드) 순회
+    for(let i=0; i< docsInCollection.length; i++) {
+      let groupName = docsInCollection[i].doc.data.value.mapValue.fields.groupName.stringValue
+      groups[i] = groupName
+    }
+    return groups
+  },
+  updateCount: function(group, keyword, sentenceId, countNumber) {
+  
+    const findDoc = getDoc(doc(db, group, keyword))
+    let changeContent = {}
+    
+    findDoc.then((res) => {
+      let docInCollection = res._document.data.value.mapValue.fields
+      let fieldToModify = docInCollection[sentenceId].mapValue.fields
+      
+      let cur_group = fieldToModify["group"].stringValue 
+      let cur_sentence = fieldToModify["sentence"].stringValue 
+      // let cur_count = (parseInt(fieldToModify["count"].integerValue) + 1)
+      
+      changeContent[sentenceId] = {
+        "count": increment(countNumber),
+        "group": cur_group,
+        "sentence": cur_sentence
+      }
+  
+      updateDoc(doc(db, group, keyword), changeContent)
+    })
+    
+    console.log("changeContent: ", changeContent)
+  
   }
 }
 // 비밀번호 저장/가져오는 api
@@ -131,19 +169,19 @@ export default {
 // }
 
 // // 그룹 가져오는 api
-// async function getGroups() {
-//   let groups = {}
-//   const collections = await getDocs(collection(db, "Groups"))
+async function getGroups() {
+  let groups = {}
+  const collections = await getDocs(collection(db, "Groups"))
 
-//   let docsInCollection = collections._snapshot.docChanges
+  let docsInCollection = collections._snapshot.docChanges
 
-//   // 해당 그룹안에 있는 docs(키워드) 순회
-//   for(let i=0; i< docsInCollection.length; i++) {
-//     let groupName = docsInCollection[i].doc.data.value.mapValue.fields.groupName.stringValue
-//     groups[i] = groupName
-//   }
-//   return groups
-// }
+  // 해당 그룹안에 있는 docs(키워드) 순회
+  for(let i=0; i< docsInCollection.length; i++) {
+    let groupName = docsInCollection[i].doc.data.value.mapValue.fields.groupName.stringValue
+    groups[i] = groupName
+  }
+  return groups
+}
 
 // 카운트 수정
 function updateCount(group, keyword, sentenceId, countNumber) {
