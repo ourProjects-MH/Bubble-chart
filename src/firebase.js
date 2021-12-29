@@ -155,8 +155,35 @@ async function setData(dataCollection) {
   
 }
 
-// 키워드별 토탈카운트 저장
+// 키워드별 토탈카운트
+async function sumTotalCountByKeyword(keyword) {
+  let result = 0
+  const collections = await getDocs(collection(db, keyword))
+  collections.forEach((document) => {
+    result += document.data().totalCount
+  })
+  return result
+}
+sumTotalCountByKeyword("keyword1")
 
+async function sentencesByKeyword(keyword) {
+  let result = {}
+  const collections = await getDocs(collection(db, keyword))
+  collections.forEach((document) => {
+    let path = document._key.path.segments
+    let group = path[path.length-1]
+
+    let sentences = document.data().sentences
+    result[group] = sentences
+  })
+  return result
+}
+sentencesByKeyword("keyword1")
+
+// // 계급데이터 가져오기
+// function getDataByGroups() {
+
+// }
 
 // 그룹 데이터 저장
 function addGroups (groups) {
