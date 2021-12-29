@@ -40,7 +40,7 @@ export default {
     
   },
   mounted() {
-    this.fetchBubbleData();
+    // this.fetchBubbleData();
     // this.fetchLevelData();
   },
   methods: {
