@@ -156,7 +156,7 @@ async function setData(dataCollection) {
 }
 
 // 키워드별 토탈카운트
-async function sumTotalCountByKeyword(keyword) {
+async function getTotalCountByKeyword(keyword) {
   let result = 0
   const collections = await getDocs(collection(db, keyword))
   collections.forEach((document) => {
@@ -164,7 +164,7 @@ async function sumTotalCountByKeyword(keyword) {
   })
   return result
 }
-sumTotalCountByKeyword("keyword1")
+getTotalCountByKeyword("keyword1")
 
 async function sentencesByKeyword(keyword) {
   let result = {}
@@ -180,10 +180,36 @@ async function sentencesByKeyword(keyword) {
 }
 sentencesByKeyword("keyword1")
 
-// // 계급데이터 가져오기
-// function getDataByGroups() {
+// 계급데이터 가져오기
+async function getDataByGroups() {
+  let groupNameList = await getGroups()
+  let result = {}
 
-// }
+  // 그룹 순회하며 하나씩 가져오기
+  for (let i in groupNameList) {
+    const collections = await getDocs(collection(db, groupNameList[i]))
+    let group = groupNameList[i]
+    let docsInCollection = collections._snapshot.docChanges
+
+      // 해당 그룹안에 있는 docs(키워드) 순회
+    for(let i=0; i< docsInCollection.length; i++) {
+      let path = docsInCollection[i].doc.key.path.segments
+      let keyword = path[path.length-1]
+
+      result[keyword] = []
+
+      let pushData = {}
+      let r = getTotalCountByKeyword(keyword)
+      r.then((res) => {
+        pushData[group] = res
+      })
+      result[keyword].push(pushData)
+    }
+  }
+  console.log("======", result)
+  return result
+}
+getDataByGroups()
 
 // 그룹 데이터 저장
 function addGroups (groups) {
