@@ -1,7 +1,10 @@
 import { initializeApp } from "firebase/app"
-import {  getFirestore, setDoc, getDocs, collection} from "firebase/firestore"
+import {  getFirestore, increment } from "firebase/firestore"
+// import {  getDocs, collection } from "firebase/firestore"
+import {  doc } from "firebase/firestore"
+// import {  setDoc } from "firebase/firestore"
 // import { collection,  addDoc } from "firebase/firestore";
-import { doc } from "firebase/firestore";
+import {  updateDoc, getDoc } from "firebase/firestore";
 initializeApp({
   apiKey: "AIzaSyCKZQz6LPTVvBzbG4gWiFW_mv_A-Gvqo7k",
   authDomain: "bubble-chart-89dd0.firebaseapp.com",
@@ -56,155 +59,118 @@ export default {
     return result
   }
 }
-// 데이터 추가
-function setData(group, keyword, sentences, totalCount) {
-  let data = new Object()
-  data["totalCount"] = totalCount
+// 비밀번호 저장/가져오는 api
 
-  for (let i=0; i < sentences.length; i++) {
-    data[i] = {
-      "sentence": sentences[i],
-      "count": 0,
-      "group": group
-    }
-  }
+// 데이터 추가
+// function setData(dataCollection) {
   
-  setDoc(doc(db, group, keyword), data)
-}
+//   for (let i in dataCollection) {
+    
+//     let data = new Object()
+//     let keyword = dataCollection[i]["keyword"]
+//     let group = dataCollection[i]["group"]
+//     data["totalCount"] = dataCollection[i]["totalCount"]
+
+//     for (let j in dataCollection[i]["sentences"]) {
+//       data[j] = {
+//         "sentence": dataCollection[i]["sentences"][j],
+//         "count": 0,
+//         "group": group
+//       }
+//     }
+//     setDoc(doc(db, group, keyword), data)
+//   }
+  
+// }
 
 // 데이터 반환
-async function getTotalData() {
-  let groupNameList = await getGroups()
-  let result = {}
-  
-  // 그룹 순회하며 하나씩 가져오기
-  for (let i in groupNameList) {
-    const collections = await getDocs(collection(db, groupNameList[i]))
+// async function getTotalData() {
+//   let groupNameList = await getGroups()
+//   let result = {}
+
+//   // 그룹 순회하며 하나씩 가져오기
+//   for (let i in groupNameList) {
+//     const collections = await getDocs(collection(db, groupNameList[i]))
     
-    let docsInCollection = collections._snapshot.docChanges
-      // 해당 그룹안에 있는 docs(키워드) 순회
-    for(let i=0; i< docsInCollection.length; i++) {
-      let path = docsInCollection[i].doc.key.path.segments
-      let keyword = path[path.length-1]
+//     let docsInCollection = collections._snapshot.docChanges
+//       // 해당 그룹안에 있는 docs(키워드) 순회
+//     for(let i=0; i< docsInCollection.length; i++) {
+//       let path = docsInCollection[i].doc.key.path.segments
+//       let keyword = path[path.length-1]
 
-      result[keyword] = {}
-      result[keyword]["sentences"] = []
+//       result[keyword] = {}
+//       result[keyword]["sentences"] = []
 
-      let sentences = docsInCollection[i].doc.data.value.mapValue.fields
-      result[keyword]["totalCount"] = sentences.totalCount.integerValue
+//       let sentences = docsInCollection[i].doc.data.value.mapValue.fields
+//       console.log(sentences)
 
-      sentences = Object.entries(sentences)
+//       result[keyword]["totalCount"] = sentences.totalCount.integerValue
+
+//       sentences = Object.entries(sentences)
       
-      for (let j=0; j<sentences.length-1; j++) {
-        let sub = {}
-        let countValue = sentences[j][1].mapValue.fields.count.integerValue
-        let group = sentences[j][1].mapValue.fields.group.stringValue
-        let sentence = sentences[j][1].mapValue.fields.sentence.stringValue
+//       for (let j=0; j<sentences.length-1; j++) {
+//         let sub = {}
+//         let countValue = sentences[j][1].mapValue.fields.count.integerValue
+//         let group = sentences[j][1].mapValue.fields.group.stringValue
+//         let sentence = sentences[j][1].mapValue.fields.sentence.stringValue
 
-        sub["sentence"] = sentence
-        sub["group"] = group
-        sub["count"] = countValue
-        sub["id"] = j
-        result[keyword]["sentences"].push(sub)
-      }
-      console.log("=====", result)
-    }
-  }
-  return result
-}
+//         sub["sentence"] = sentence
+//         sub["group"] = group
+//         sub["count"] = countValue
+//         sub["id"] = j
+//         result[keyword]["sentences"].push(sub)
+//       }
+//     }
+//   }
+//   return result
+// }
 
 // 그룹 데이터 저장
-function addGroups (group) {
-  setDoc(doc(db, "Groups", group), {"groupName": group})
-}
-
-// 그룹 가져오는 api
-async function getGroups() {
-  let groups = {}
-  const collections = await getDocs(collection(db, "Groups"))
-
-  let docsInCollection = collections._snapshot.docChanges
-
-  // 해당 그룹안에 있는 docs(키워드) 순회
-  for(let i=0; i< docsInCollection.length; i++) {
-    let groupName = docsInCollection[i].doc.data.value.mapValue.fields.groupName.stringValue
-    groups[i] = groupName
-  }
-  return groups
-}
-
-// 버블차트 데이터 저장 api
-function setBubblechartData(keyword, sentences, count) {
-  let arrayData = {}
-  for (let i = 0; i< sentences.length; i++) {
-    let sub = {}
-    sub["sentence"] = sentences[i]
-    sub["count"] = count[i]
-
-    arrayData[i] = sub
-  }
-  setDoc(doc(db, "bubbleChart", keyword), arrayData)
-}
-
-function getBubblechartData() {
-  let result = new Object()
-  
-  // 키워드 { 문장: 문장, 카운트: 카운트}
-  const collections = getDocs(collection(db, "bubbleChart"))
-  collections.then((res) => {
-    let docsInCollection = res._snapshot.docChanges
-    
-    // 해당 그룹안에 있는 docs(키워드) 순회
-    for(let i=0; i< docsInCollection.length; i++) {
-      let path = docsInCollection[i].doc.key.path.segments
-      let keyword = path[path.length-1]
-      result[keyword] = []
-
-      let fields = docsInCollection[i].doc.data.value.mapValue.fields
-      fields = Object.entries(fields)
-      for (let j=0; j<fields.length; j++) {
-        let count = fields[j][1].mapValue.fields.count.integerValue
-        let sentence = fields[j][1].mapValue.fields.sentence.stringValue
-        let sub = {
-          "sentence": sentence,
-          "count": count,
-        }
-        result[keyword].push(sub)
-      }
-
-    }
-  })
-  return result
-}
-// 카운트 수정
-// function updateCount(group, keyword, sentenceId) {
-//   // console.log(doc(db, group, keyword))
-//   let a = getDocs(collection(db, group))
-//   a.then((res) => {
-//     console.log("++", res)
-//   })
-
-//   const findDoc = getDoc(doc(db, group, keyword))
-//   let changeContent = new Object()
-//   changeContent[sentenceId] = new Object()
-
-//   // console.log(findDoc)
-//   findDoc.then((res) => {
-//     console.log(res)
-//     // let docsInCollection = res._document.data.value.mapValue.fields.values()
-//     // console.log(docsInCollection)
-//     // // let docToModify = docsInCollection[sentenceId].mapValue.fields
-//     // console.log("+++", docsInCollection)
-//     // changeContent[sentenceId]["group"] = docToModify["group"]
-//     // changeContent[sentenceId]["sentence"] = docToModify["sentence"]
-//     // changeContent[sentenceId]["count"] = docToModify["count"]
-//     // console.log(changeContent, docToModify["group"])
-//     // changeContent[sentenceId]["count"]["integerValue"] = (parseInt(docToModify["count"].integerValue) + 1).toString()
-//   })
-//   updateDoc(doc(db, group, keyword), changeContent)
-  
-//   console.log(group, keyword, sentenceId)
+// function addGroups (group) {
+//   setDoc(doc(db, "Groups", group), {"groupName": group})
 // }
+
+// // 그룹 가져오는 api
+// async function getGroups() {
+//   let groups = {}
+//   const collections = await getDocs(collection(db, "Groups"))
+
+//   let docsInCollection = collections._snapshot.docChanges
+
+//   // 해당 그룹안에 있는 docs(키워드) 순회
+//   for(let i=0; i< docsInCollection.length; i++) {
+//     let groupName = docsInCollection[i].doc.data.value.mapValue.fields.groupName.stringValue
+//     groups[i] = groupName
+//   }
+//   return groups
+// }
+
+// 카운트 수정
+function updateCount(group, keyword, sentenceId, countNumber) {
+  
+  const findDoc = getDoc(doc(db, group, keyword))
+  let changeContent = {}
+  
+  findDoc.then((res) => {
+    let docInCollection = res._document.data.value.mapValue.fields
+    let fieldToModify = docInCollection[sentenceId].mapValue.fields
+    
+    let cur_group = fieldToModify["group"].stringValue 
+    let cur_sentence = fieldToModify["sentence"].stringValue 
+    // let cur_count = (parseInt(fieldToModify["count"].integerValue) + 1)
+    
+    changeContent[sentenceId] = {
+      "count": increment(countNumber),
+      "group": cur_group,
+      "sentence": cur_sentence
+    }
+
+    updateDoc(doc(db, group, keyword), changeContent)
+  })
+  
+  console.log("changeContent: ", changeContent)
+
+}
 
 // 키워드 삭제 api
 // function deleteKeyword(group, keyword) {
@@ -212,54 +178,63 @@ function getBubblechartData() {
 // }
 
 
-// // 데이터 수정 => 문장 수정할시..?
-// function modifyData(group, keyword, sentenceId, changeCount, changeGroup, changeSentence) {
-//   console.log("들와따")
-//   // const findDoc = getDocs(collection(db, group));
-//   const findDoc = getDoc(doc(db, group, keyword))
-//   findDoc.then((res) => {
-//     let docsInCollection = res._document.data.value.mapValue.fields
-//     let docToModify = docsInCollection[sentenceId]
-//     console.log("== 변경 전", docToModify)
-
-//     // 수정
-//     docToModify[count] = changeCount
-//     docToModify[group] = changeGroup
-//     docToModify[sentence] = changeSentence
-
-//     console.log("== 변경 후", docToModify)
-//   })
-// }
 
 
 // 함수 실행
 // setData(group, keyword, sentences, totalCount)
-setData("임원", "팀플", ["어려워요", "재미있어요", "꺌꺌꺌"], 30)
-setData("임원", "분담", ["짜릿해요", "호로록", "꺄르륵"], 30)
-setData("팀원", "업무", ["힘들어요", "뭔소린지", "모르겠어요"], 30)
 
-addGroups("임원")
-addGroups("팀원")
+// setData([
+//   {
+//     "group": "임원",
+//     "keyword": "분담",
+//     "totalCount": 30,
+//     "sentences": ["어려워요", "재미있어요", "꺌꺌꺌"],
+//   },
+//   {
+//     "group": "임원",
+//     "keyword": "분담",
+//     "totalCount": 30,
+//     "sentences": ["어려워요2", "재미있어요2", "꺌꺌꺌2"],
+//   },
+//   {
+//     "group": "팀원",
+//     "keyword": "업무",
+//     "totalCount": 30,
+//     "sentences": ["어려워요", "재미있어요", "꺌꺌꺌"],
+//   }
+// ])
+// setData("임원", "팀플", ["어려워요", "재미있어요", "꺌꺌꺌"], 30)
+// setData("임원", "분담", ["짜릿해요", "호로록", "꺄르륵"], 30)
+// setData("팀원", "업무", ["힘들어요", "뭔소린지", "모르겠어요"], 30)
 
-getTotalData().then((res => {
-  console.log(res)
-}))
+// addGroups("임원")
+// addGroups("팀원")
 
-// 버블차트 데이터
-setBubblechartData("keyword", ["sentence1", "sentence2", "sentence3"], [20, 20, 20])
-setBubblechartData("하이하이", ["짜릿해요", "호로록", "꺄르륵"], [20, 20, 20])
-getBubblechartData()
+// getTotalData().then((res => {
+//   console.log(res)
+// }))
 
 // 삭제
 // deleteKeyword("임원", "팀플")
 
 // 카운트 수정
-// updateCount("임원", "분담", 0)
-// updateCount("임원", "분담", 0)
+updateCount("임원", "분담", 2, 1)
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// 버블차트 데이터
+// setBubblechartData("keyword", ["sentence1", "sentence2", "sentence3"], [20, 20, 20])
+// setBubblechartData("하이하이", ["짜릿해요", "호로록", "꺄르륵"], [20, 20, 20])
+// getBubblechartData()
+
+
 
 // function setTotalData(id, group, keyword, sentenceList, totalCount) {
-//   // collection: data, doc: id, 필드안에 다 넣기
-//   let data = {}
+  //   // collection: data, doc: id, 필드안에 다 넣기
+  //   let data = {}
   
 //   data[group] = []
 //   for (let i=0; i < sentenceList.length; i++) {
@@ -282,75 +257,46 @@ getBubblechartData()
 // setTotalData("2", "group3", "keyword3", ["sentence1", "sentence2", "sentence3"], 30)
 
 
+// 버블차트 데이터 저장 api
+// function setBubblechartData(keyword, sentences, count) {
+//   let arrayData = {}
+//   for (let i = 0; i< sentences.length; i++) {
+//     let sub = {}
+//     sub["sentence"] = sentences[i]
+//     sub["count"] = count[i]
 
-
-// 그룹 함수, 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// function setData(group, keyword, sentences) {
-//   let data = new Object()
-//   data[keyword] = new Object()
-//   data[keyword]["sentences"] = new Object()
-//   for (let i=0; i < sentences.length; i++) {
-//     data[keyword]["sentences"][i] = {
-//       "sentence": sentences[i],
-//       "count": 0,
-//     }
+//     arrayData[i] = sub
 //   }
+//   setDoc(doc(db, "bubbleChart", keyword), arrayData)
+// }
+
+// function getBubblechartData() {
+//   let result = new Object()
   
-//   setDoc(doc(db, "data", group), data)
-// }
+//   // 키워드 { 문장: 문장, 카운트: 카운트}
+//   const collections = getDocs(collection(db, "bubbleChart"))
+//   collections.then((res) => {
+//     let docsInCollection = res._snapshot.docChanges
+    
+//     // 해당 그룹안에 있는 docs(키워드) 순회
+//     for(let i=0; i< docsInCollection.length; i++) {
+//       let path = docsInCollection[i].doc.key.path.segments
+//       let keyword = path[path.length-1]
+//       result[keyword] = []
 
+//       let fields = docsInCollection[i].doc.data.value.mapValue.fields
+//       fields = Object.entries(fields)
+//       for (let j=0; j<fields.length; j++) {
+//         let count = fields[j][1].mapValue.fields.count.integerValue
+//         let sentence = fields[j][1].mapValue.fields.sentence.stringValue
+//         let sub = {
+//           "sentence": sentence,
+//           "count": count,
+//         }
+//         result[keyword].push(sub)
+//       }
 
-// GET
-// const docRef = doc(db, "test2", "data");
-// getDoc(docRef).then((res) => console.log(res.metadata));
-
-
-// const docSnap = getDoc(docRef);
-// console.log(docSnap.data.th)
-
-// 버블개수, 버블 키워드 받은 것 기준으로 데이터 넣는 함수
-// function setData(bubbleCount, keywordList) {
-//   for (let i=0; i<keywordList.length; i++) {
-//     let object = new Object()
-//     let word1 = keywordList[i]
-//     const content = {
-//         "test": 1,
-//         "test2": 2,
 //     }
-//     object[word1] = content
-//     addDoc(doc(db, "test2", "data"), object);
-//   }
-//   // keywordList.forEach(element => {
-//   //   const content = {
-//   //     element: {
-//   //       "test": 1,
-//   //       "test2": 2,
-//   //     }
-//   //   }
-//   //   setDoc(doc(db, "test2", "data"), content);
-//   // });
-// }
-
-// let sentence = sentences[j][1].mapValue.fields.sentence.stringValue
-        
-// result["임원"][keyword][j] = {
-//   "count": count,
-//   "sentence": sentence
+//   })
+//   return result
 // }
