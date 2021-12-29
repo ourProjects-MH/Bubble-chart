@@ -41,27 +41,27 @@ export default {
   },
   mounted() {
     this.fetchBubbleData();
-    this.fetchLevelData();
+    // this.fetchLevelData();
   },
   methods: {
-    async fetchBubbleData() {
-      const loaddata = await firebase.getTotalDatatwo()
-      console.log(loaddata)
-      this.children = []
-
-      for (var element in loaddata) {
-        var sentences = []
-        var element_total = loaddata[element]["totalcount"]
-        for (var i in loaddata[element]["sentences"]) {
-          sentences.push(loaddata[element]["sentences"][i]["sentence"])
+    fetchBubbleData() {
+      
+      const loaddata = firebase.getTotalData()
+      loaddata.then((res) => {
+        
+        this.children = []
+  
+        for (var element in res) {
+          var sentences = []
+          var element_totalcount = res[element]["totalCount"]
+          for (var i in res[element]["sentences"]) {
+            sentences.push(res[element]["sentences"][i]["sentence"])
+          }
+          this.children.push({"name": element, "sentences": sentences, "value": element_totalcount})
         }
-        this.children.push({"name": element, "sentences": sentences, "value": element_total})
-      }
-      console.log(loaddata)
-      console.log(JSON.stringify(this.item))
-      for (var el in loaddata) {
-        console.log(loaddata[el])
-      }
+        console.log(this.children)
+  
+      })
 
     },
     async fetchLevelData() {
