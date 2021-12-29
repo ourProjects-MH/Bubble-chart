@@ -15,21 +15,29 @@ import * as d3 from 'd3'
 import Header from "@/components/Header.vue"
 import Bubble from "@/components/Bubble.vue"
 import OpinionSession from "@/components/OpinionSession.vue"
+import firebase from "@/firebase.js"
 
 export default {
   name: 'Main',
   data() {
     return {
+      data: {
+      },
       tmp: false, 
       children: null,
       bubble_size: 0,
       opinions: null,
     }
   },
+  watch: {
+  },
   components: {
     Header,
     Bubble,
     OpinionSession,
+  },
+  created() {
+    
   },
   mounted() {
     this.fetchBubbleData();
@@ -37,25 +45,8 @@ export default {
   },
   methods: {
     async fetchBubbleData() {
-      // const header_loaddata = ''
-      // fetch("./과장.json")
-      //   .then(res => {return res.json()})
-      //   .then(header_loaddata  => console.log(header_loaddata))
-
-      const loaddata = await d3.json("./keyword.json")
-
-      // const manager_loaddata = await d3.json("./직원.json");
-      // const employee_loaddata = await d3.json("./팀장.json");
-
-      // let loaddata = [header_loaddata, manager_loaddata, employee_loaddata]
-
-      // 데이터 합치기
-      // var result = loaddata.reduce(function(r, e) {
-      //   return Object.keys(e).forEach(function(k) {
-      //     if (!r[k]) r[k] = [].concat(e[k])
-      //     else r[k][0].sentences = r[k][0].sentences.concat(e[k].sentences)
-      //   }), r
-      // }, {})
+      const loaddata = await firebase.getTotalDatatwo()
+      console.log(loaddata)
       this.children = []
 
       for (var element in loaddata) {
@@ -66,21 +57,12 @@ export default {
         }
         this.children.push({"name": element, "sentences": sentences, "value": element_total})
       }
+      console.log(loaddata)
+      console.log(JSON.stringify(this.item))
+      for (var el in loaddata) {
+        console.log(loaddata[el])
+      }
 
-      // bubble chart에 맞는 형식으로 데이터 변환
-      // for (var element in result) {
-      //   var sentences = result[element][0].sentences
-      //   var bubble_value = 0
-      //   var bubble_sentences = []
-      //   for (var i in sentences) {
-      //     for (const [key, value] of Object.entries(sentences[i])) {
-      //       bubble_sentences.push(key)
-      //       this.bubble_size += value
-      //       bubble_value += value
-      //     }
-      //   }
-      //   this.children.push({"name": element, "sentences": bubble_sentences, "value": bubble_value})
-      // }
     },
     async fetchLevelData() {
       const loaddata = await d3.json("./separate.json")

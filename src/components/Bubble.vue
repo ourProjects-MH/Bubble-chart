@@ -34,7 +34,7 @@ export default {
     children: Array,
   },
   created() {
-   
+  
   },
   mounted() {
     this.make_bubble()
@@ -44,8 +44,7 @@ export default {
 
       if (!this.children) {
         return
-      }
-
+      } 
       var json = { 'children': this.children.slice(0) }
       // name(string), sentences(array), value(int)
 
@@ -138,7 +137,7 @@ export default {
     },
     changeModal() {
       this.openModal = !this.openModal
-    }
+    },
   }
 }
 </script>
