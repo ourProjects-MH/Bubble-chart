@@ -271,10 +271,11 @@ getTotalCountByKeyword("keyword1")
 // }
 // setPassword("admin")
 
-// async function getPassword () {
-//   let passwordDoc = await getDoc(doc(db, "Password", "password"))
-//   console.log(passwordDoc)
-// }
+async function getPassword () {
+  let passwordDoc = await getDoc(doc(db, "Password", "password"))
+  return passwordDoc.data().password
+}
+getPassword()
 
 // 비밀번호 수정
 // function updatePassword(newPassword) {
