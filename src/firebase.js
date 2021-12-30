@@ -1,8 +1,8 @@
 import { initializeApp } from "firebase/app"
-import { getFirestore } from "firebase/firestore"
+import { deleteDoc, getFirestore } from "firebase/firestore"
 // import { getDocs, collection } from "firebase/firestore"
 import { doc } from "firebase/firestore"
-// import { setDoc } from "firebase/firestore"
+import { setDoc } from "firebase/firestore"
 // import { deleteDoc } from "firebase/firestore"
 import { collection, getDocs } from "firebase/firestore";
 import {  updateDoc, getDoc, increment } from "firebase/firestore";
@@ -113,51 +113,84 @@ async function getTotalData() {
 //   }
 // }
 
-// 데이터 추가
-// async function setData(dataCollection) {
-//   let groups = []
-//   // 기존 데이터 삭제
-//   for (let i in dataCollection) {
-//     groups.push(dataCollection[i]["group"])
-//   }
-//   groups = new Set(groups)
-//   groups.forEach((g) => {
-//     deleteDocs(g)
-//   })
-
-//   // 그룹별로 저장
-//   for (let i in dataCollection) {
-    
-//     let data = new Object()
-//     let keyword = dataCollection[i]["keyword"]
-//     let group = dataCollection[i]["group"]
-
-//     data["totalCount"] = dataCollection[i]["totalCount"]
-
-//     for (let j in dataCollection[i]["sentences"]) {
-//       data[j] = {
-//         "sentence": dataCollection[i]["sentences"][j],
-//         "count": 0,
-//         "group": group
-//       }
-//     }
-//     await setDoc(doc(db, group, keyword), data)
-//   }
-
-//   // 키워드별로 저장
-//   for (let i in dataCollection) {
-    
-//     let data = new Object()
-//     let keyword = dataCollection[i]["keyword"]
-//     let group = dataCollection[i]["group"]
-
-//     data["totalCount"] = dataCollection[i]["totalCount"]
-//     data["sentences"] = dataCollection[i]["sentences"]
-
-//     await setDoc(doc(db, keyword, group), data)
-//   }
+// 기존 데이터 삭제
+async function deleteOriginalData() {
+  let removeList = []
+  for (let word of ["Groups", "Keywords"]) {
+    const collections = await getDocs(collection(db, word))
+    let docsInCollection = collections._snapshot.docChanges
   
-// }
+    for(let i=0; i< docsInCollection.length; i++) {
+      let path = docsInCollection[i].doc.key.path.segments
+      let word = path[path.length-1]
+      removeList.push(word)
+    }
+  }
+  for (let word of removeList) {
+    const collections = await getDocs(collection(db, word))
+    let docsInCollection = collections._snapshot.docChanges
+  
+    for(let i=0; i< docsInCollection.length; i++) {
+      let path = docsInCollection[i].doc.key.path.segments
+      let docName = path[path.length-1]
+      await deleteDoc(doc(db, word, docName))
+    }
+  }
+}
+
+// 데이터 추가
+async function setData(dataCollection) {
+  console.log(dataCollection)
+  // 그룹이랑 키워드 collection 돌면서 다 삭제한다.
+  // 만약 키워드 네임을 수정했을 경우, 기존 키워드는 컬렉션에 남아있음.
+  // 하지만 문제될거는 없을 것 같음
+  // 그룹만 변동사항 없으면 될 것 같음.
+  // 키워드 컬렉션 하나 만들어서 키워드 넣기.
+  
+  // 기존 데이터 삭제
+  await deleteOriginalData()
+  let keywords = []
+  // 그룹별로 저장
+  for (let i in dataCollection) {
+    
+    let data = new Object()
+    let keyword = dataCollection[i]["keyword"]
+    let group = dataCollection[i]["group"]
+
+    // 키워드 따로 저장
+    keywords.push(keyword)
+
+    data["totalCount"] = dataCollection[i]["totalCount"]
+
+    for (let j in dataCollection[i]["sentences"]) {
+      data[j] = {
+        "sentence": dataCollection[i]["sentences"][j],
+        "count": 0,
+        "group": group
+      }
+    }
+    await setDoc(doc(db, group, keyword), data)
+  }
+
+  // 키워드별로 저장
+  for (let i in dataCollection) {
+    
+    let data = new Object()
+    let keyword = dataCollection[i]["keyword"]
+    let group = dataCollection[i]["group"]
+
+    data["totalCount"] = dataCollection[i]["totalCount"]
+    data["sentences"] = dataCollection[i]["sentences"]
+
+    await setDoc(doc(db, keyword, group), data)
+  }
+  
+  // 키워드만 저장
+  keywords = Array.from(new Set(keywords))
+  for (let i in keywords) {
+    await setDoc(doc(db, "Keywords", keywords[i]), {"keywords": keywords[i]})
+  }
+}
 
 // 키워드별 토탈카운트
 async function getTotalCountByKeyword(keyword) {
@@ -232,7 +265,6 @@ getTotalCountByKeyword("keyword1")
 //     setDoc(doc(db, "Groups", groups[group]), {"groupName": groups[group]})
 //   }
 // }
-
 // 비밀번호 저장
 // function setPassword (password) {
 //   setDoc(doc(db, "Password", "password"), {"password": password})
@@ -288,9 +320,6 @@ async function updateCount(group, keyword, sentenceId) {
   console.log("changeContent: ", changeContent)
 
 }
-updateCount("group1", "keyword1", 0)
-updateCount("group1", "keyword1", 0)
-updateCount("group1", "keyword1", 0)
 
 // ======= 수정할 때 보여줄 데이터 ======
 // 키워드1 : {
@@ -364,34 +393,38 @@ getCurrentData()
 
 
 
-getTotalData()
 // addGroups(["group1", "group2", "group3"])
-// setData([
-//   {
-//     "group": "group1",
-//     "keyword": "keyword1",
-//     "totalCount": 10,
-//     "sentences": ["어려워요group1", "재미있어요", "꺌꺌꺌"],
-//   },
-//   {
-//     "group": "group1",
-//     "keyword": "keyword2",
-//     "totalCount": 10,
-//     "sentences": ["어려워요2group1", "재미있어요2", "꺌꺌꺌2"],
-//   },
-//   {
-//     "group": "group2",
-//     "keyword": "keyword1",
-//     "totalCount": 20,
-//     "sentences": ["어려워요group2", "재미있어요", "꺌꺌꺌"],
-//   },
-//   {
-//     "group": "group3",
-//     "keyword": "keyword1",
-//     "totalCount": 30,
-//     "sentences": ["어려워요group3", "재미있어요", "꺌꺌꺌"],
-//   }
-// ])
+setData([
+  {
+    "group": "group1",
+    "keyword": "keyword1",
+    "totalCount": 10,
+    "sentences": ["어려워요group1", "재미있어요", "꺌꺌꺌"],
+  },
+  {
+    "group": "group1",
+    "keyword": "keyword2",
+    "totalCount": 10,
+    "sentences": ["어려워요2group1", "재미있어요2", "꺌꺌꺌2"],
+  },
+  {
+    "group": "group2",
+    "keyword": "keyword1",
+    "totalCount": 20,
+    "sentences": ["어려워요group2", "재미있어요", "꺌꺌꺌"],
+  },
+  {
+    "group": "group3",
+    "keyword": "keyword1",
+    "totalCount": 30,
+    "sentences": ["어려워요group3", "재미있어요", "꺌꺌꺌"],
+  }
+])
+getTotalData()
+
+updateCount("group1", "keyword1", 0)
+updateCount("group1", "keyword1", 0)
+updateCount("group1", "keyword1", 0)
 // 삭제
 // deleteKeyword("임원", "팀플")
 // deleteDocs("Groups")
