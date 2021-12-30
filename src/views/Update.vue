@@ -1,23 +1,6 @@
 <template>
   <div id="app" class="container">
     <h1>Data Collections</h1>
-    <div class="group-section">
-      <input 
-        v-model="group1" 
-        type="text" 
-        class="form-control" 
-        placeholder="Group1">
-      <input 
-        v-model="group2" 
-        type="text" 
-        class="form-control" 
-        placeholder="Group2">
-      <input 
-        v-model="group3" 
-        type="text" 
-        class="form-control" 
-        placeholder="Group3">
-    </div>
     <div class="section">
       <div class="data" v-for="(data, idx) in data_collections" :key="idx">
         <div class="idx">{{ idx+1 }}.</div>
@@ -31,11 +14,20 @@
         </div>
         <div class="form-group">
           <div class="form-title">Group</div>
-          <input 
+          <!-- <input 
+            v-model="data.group" 
+            type="text" 
+            class="form-control" 
+            placeholder="Group"> -->
+          <select 
             v-model="data.group" 
             type="text" 
             class="form-control" 
             placeholder="Group">
+            <option :value="group1">{{ group1 }}</option>
+            <option :value="group2">{{ group2 }}</option>
+            <option :value="group3">{{ group3 }}</option>
+          </select>
         </div>
         <div class="form-group">
           <div class="form-title">Total Count</div>
@@ -110,12 +102,16 @@
 </template>
 
 <script>
+import firebase from "@/firebase.js"
 
 export default {
   name: "App",
   
   data() {
     return {
+      group1: null,
+      group2: null,
+      group3: null,
       data_collections: [
         {
           keyword: "Foxconn",
@@ -132,11 +128,39 @@ export default {
       ]
     }
   },
+  mounted() {
+    this.fetchData();
+  },
   methods: {
+    fetchData() {
+      const loadgroups = firebase.getGroups()
+      loadgroups.then((res) => {
+        this.group1 = res[0]
+        this.group2 = res[1]
+        this.group3 = res[2]
+      })
+      const loaddata = firebase.getTotalData()
+      loaddata.then((res) => {
+        for (var el in res) {
+          console.log(el)
+          var sentences = []
+          for (var i in res[el]["sentences"]) {
+            sentences.push(res[el]["sentences"][i]["sentence"])
+          }
+          this.data_collections.push({
+            keyword: el,
+            group: this.group1,
+            totalcount: res[el]["totalCount"],
+            sentences: sentences,
+          })
+        }
+      })
+    },
     addData () {
       this.data_collections.push({
-        keyword: '',
-        group: '',
+        keyword: "new keyword",
+        group: this.group1,
+        totalcount: 0,
         sentences: []
       })
     },
@@ -165,10 +189,6 @@ export default {
   margin: 0.2rem;
 }
 .section {
-  border-bottom: 2px solid rgb(61, 63, 65);
-  margin: 3rem;
-}
-.group-section {
   border-bottom: 2px solid rgb(61, 63, 65);
   margin: 3rem;
 }
