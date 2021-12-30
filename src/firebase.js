@@ -288,7 +288,65 @@ async function updateCount(group, keyword, sentenceId) {
   console.log("changeContent: ", changeContent)
 
 }
-updateCount("group1", "keyword1", 0) 
+updateCount("group1", "keyword1", 0)
+updateCount("group1", "keyword1", 0)
+updateCount("group1", "keyword1", 0)
+
+// ======= 수정할 때 보여줄 데이터 ======
+// 키워드1 : {
+//   직급1,
+//   토탈카운트,
+//   문장
+//   }
+
+async function getCurrentData() {
+  // 키워드 배열 생성
+  let groupNameList = await getGroups()
+  let result = {}
+  let keywordList = []
+
+  // 키워드당 빈 배열을 만들어주기
+  for (let i in groupNameList) {
+    const collections = await getDocs(collection(db, groupNameList[i]))
+    let docsInCollection = collections._snapshot.docChanges
+    
+    for(let i=0; i< docsInCollection.length; i++) {
+      let path = docsInCollection[i].doc.key.path.segments
+      let keyword = path[path.length-1]
+      keywordList.push(keyword)
+      result[keyword] = {}
+    }
+  }
+  // 키워드 중복 제거
+  keywordList = Array.from(new Set(keywordList))
+
+  // 그룹 순회하며 하나씩 가져오기
+  for (let i in keywordList) {
+    const collections = await getDocs(collection(db, keywordList[i]))
+    let keyword = keywordList[i]
+    let docsInCollection = collections._snapshot.docChanges
+
+    // 해당 그룹안에 있는 docs(키워드) 순회
+    for(let i=0; i< docsInCollection.length; i++) {
+      let path = docsInCollection[i].doc.key.path.segments
+      let group = path[path.length-1]
+      let fieldsInDoc = docsInCollection[i].doc.data.value.mapValue.fields
+
+      let totalCount = fieldsInDoc.totalCount.integerValue
+      let sentencesObject = fieldsInDoc.sentences.arrayValue.values
+      let sentences = []
+      for (let i in sentencesObject) {
+        sentences.push(sentencesObject[i].stringValue)
+      }
+      result[keyword][group] = {
+        "totalCount": totalCount,
+        "sentences": sentences
+      }
+    }
+  }
+  console.log("result: ", result)
+}
+getCurrentData()
 // 키워드 삭제 api
 // function deleteKeyword(group, keyword) {
 //   deleteDoc(doc(db, group, keyword));
@@ -343,86 +401,6 @@ getTotalData()
 
 
 
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// 버블차트 데이터
-// setBubblechartData("keyword", ["sentence1", "sentence2", "sentence3"], [20, 20, 20])
-// setBubblechartData("하이하이", ["짜릿해요", "호로록", "꺄르륵"], [20, 20, 20])
-// getBubblechartData()
-
-
-
-// function setTotalData(id, group, keyword, sentenceList, totalCount) {
-  //   // collection: data, doc: id, 필드안에 다 넣기
-  //   let data = {}
-  
-//   data[group] = []
-//   for (let i=0; i < sentenceList.length; i++) {
-//     let sub = {}
-//     sub[i] = {
-//       "sentence": sentenceList[i],
-//       "count": 0,
-//       "group": group
-//     }
-//     data[group].push(sub)
-//   }
-
-//   data["keyword"] = keyword
-//   data["totalCount"] = totalCount
-//   setDoc(doc(db, "DATA", id), data)
-// }
-// setTotalData("0", "group1", "keyword1", ["sentence1", "sentence2", "sentence3"], 30)
-// setTotalData("0", "group2", "keyword1", ["sentence1", "sentence2", "sentence3"], 30)
-// setTotalData("1", "group2", "keyword2", ["sentence1", "sentence2", "sentence3"], 30)
-// setTotalData("2", "group3", "keyword3", ["sentence1", "sentence2", "sentence3"], 30)
-
-
-// 버블차트 데이터 저장 api
-// function setBubblechartData(keyword, sentences, count) {
-//   let arrayData = {}
-//   for (let i = 0; i< sentences.length; i++) {
-//     let sub = {}
-//     sub["sentence"] = sentences[i]
-//     sub["count"] = count[i]
-
-//     arrayData[i] = sub
-//   }
-//   setDoc(doc(db, "bubbleChart", keyword), arrayData)
-// }
-
-// function getBubblechartData() {
-//   let result = new Object()
-  
-//   // 키워드 { 문장: 문장, 카운트: 카운트}
-//   const collections = getDocs(collection(db, "bubbleChart"))
-//   collections.then((res) => {
-//     let docsInCollection = res._snapshot.docChanges
-    
-//     // 해당 그룹안에 있는 docs(키워드) 순회
-//     for(let i=0; i< docsInCollection.length; i++) {
-//       let path = docsInCollection[i].doc.key.path.segments
-//       let keyword = path[path.length-1]
-//       result[keyword] = []
-
-//       let fields = docsInCollection[i].doc.data.value.mapValue.fields
-//       fields = Object.entries(fields)
-//       for (let j=0; j<fields.length; j++) {
-//         let count = fields[j][1].mapValue.fields.count.integerValue
-//         let sentence = fields[j][1].mapValue.fields.sentence.stringValue
-//         let sub = {
-//           "sentence": sentence,
-//           "count": count,
-//         }
-//         result[keyword].push(sub)
-//       }
-
-//     }
-//   })
-//   return result
-// }
 
 
 
