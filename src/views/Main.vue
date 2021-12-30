@@ -70,7 +70,8 @@ export default {
     },
     fetchLevelData() {
       const loadgroups = firebase.getGroups()
-      const loaddata = firebase.getTotalData()
+      const loaddata = firebase.getDataByGroups()
+      console.log(loaddata)
       loadgroups.then((groups) => {
         const group1 = groups[0]
         // const group1 = "팀장"

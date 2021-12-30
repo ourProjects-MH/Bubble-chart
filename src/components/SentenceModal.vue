@@ -2,7 +2,7 @@
   <div>
     <v-row justify="center">
       <v-dialog
-        v-model="dialog"
+        v-model="modal"
         max-width="600"
       >
         <v-card>
@@ -22,7 +22,7 @@
           </v-btn>
           </div>
 
-          <v-card-text class="between" v-for="(sentence, idx) in selected_sentences" :key="idx" >
+          <v-card-text class="between no-padding-bottom" v-for="(sentence, idx) in selected_sentences" :key="sentence['sentence_id']" >
             <div class="align-center">
               {{ sentence["sentence"] }}
             </div>
@@ -34,7 +34,7 @@
                 color="red lighten-2"
                 @click="likeSentence(sentence, idx)"
               >
-                <v-icon :id="selected_keyword + 'btn'+ idx">mdi-heart-outline</v-icon>
+                <v-icon :id="selected_keyword + '-btn-'+ String(idx)">mdi-heart-outline</v-icon>
               </v-btn>
               {{ sentence["sentence_count"] }}
             </div>
@@ -59,7 +59,7 @@ export default {
     }
   },
   props: {
-    dialog: Boolean,
+    modal: Boolean,
     selected_keyword: String,
     selected_sentences: Array,
   },
@@ -67,25 +67,26 @@ export default {
   },
   methods: {
     closeModal() {
-      this.$emit('changeModal')
+      this.$emit('closeModal')
     },
     likeSentence(data, idx) {
-      console.log(data, idx)
-      var id = this.selected_keyword + "btn" + String(idx)
+     
+      var id = this.selected_keyword + "-btn-" + String(idx)
       var btn = document.getElementById(id)
-      console.log(btn)
+
       // var group = data["sentence_group"]
       // var count = parseInt(data["sentence_count"])+1
       if (btn.classList.contains("mdi-heart")) {
         alert('이미 좋아요를 누르셨습니다.')
         return
-        }
+      }
       // firebase.updateCount(group, this.selected_keyword, id, count)
-        data["sentence_count"] = parseInt(data["sentence_count"])+1
-        console.log(btn)
-        btn.classList.remove("mdi-heart-outline")
-        btn.classList += " mdi-heart"
-
+      data["sentence_count"] = parseInt(data["sentence_count"])+1
+      // console.log(btn)
+      // btn.innerHTML = "mdi-heart"
+      btn.classList.remove("mdi-heart-outline")
+      btn.classList += " mdi-heart"
+      // btn을 x후 페이지 리렌더링을 하지 않으면 같은 인덱스 번호를 가진 btn icon이 같이 바뀜
     }
   }
 }
@@ -103,5 +104,8 @@ export default {
 }
 .title {
   font-weight: bold;
+}
+.no-padding-bottom {
+  padding-bottom: 0 !important;
 }
 </style>
