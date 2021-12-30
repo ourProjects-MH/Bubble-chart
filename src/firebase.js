@@ -42,7 +42,6 @@ async function getTotalData() {
       result[keyword]["totalCount"] = sentences.totalCount.integerValue
       
       sentences = Object.entries(sentences)
-      console.log("!!!!!!", sentences)
 
       for (let j=0; j<sentences.length-1; j++) {
         let sub = {}
@@ -166,6 +165,7 @@ async function getTotalCountByKeyword(keyword) {
 }
 getTotalCountByKeyword("keyword1")
 
+// 키워드별 문장들
 async function sentencesByKeyword(keyword) {
   let result = {}
   const collections = await getDocs(collection(db, keyword))
@@ -185,28 +185,38 @@ async function getDataByGroups() {
   let groupNameList = await getGroups()
   let result = {}
 
+  // 키워드당 빈 배열을 만들어주기
+  for (let i in groupNameList) {
+    const collections = await getDocs(collection(db, groupNameList[i]))
+    let docsInCollection = collections._snapshot.docChanges
+    
+    for(let i=0; i< docsInCollection.length; i++) {
+      let path = docsInCollection[i].doc.key.path.segments
+      let keyword = path[path.length-1]
+      result[keyword] = {}
+    }
+  }
+
   // 그룹 순회하며 하나씩 가져오기
   for (let i in groupNameList) {
     const collections = await getDocs(collection(db, groupNameList[i]))
     let group = groupNameList[i]
     let docsInCollection = collections._snapshot.docChanges
-
-      // 해당 그룹안에 있는 docs(키워드) 순회
+    
+    // 해당 그룹안에 있는 docs(키워드) 순회
     for(let i=0; i< docsInCollection.length; i++) {
       let path = docsInCollection[i].doc.key.path.segments
       let keyword = path[path.length-1]
 
-      result[keyword] = []
-
-      let pushData = {}
-      let r = getTotalCountByKeyword(keyword)
-      r.then((res) => {
-        pushData[group] = res
-      })
-      result[keyword].push(pushData)
+      // let pushData = {}
+      let value = await getTotalCountByKeyword(keyword)
+      result[keyword][group] = value
+      // pushData[group] = value
+      // console.log(pushData)
+      // result[keyword].push(pushData)
     }
   }
-  console.log("======", result)
+  console.log("계급데이터", result)
   return result
 }
 getDataByGroups()
@@ -300,26 +310,26 @@ setData([
   {
     "group": "group1",
     "keyword": "keyword1",
-    "totalCount": 30,
-    "sentences": ["어려워요", "재미있어요", "꺌꺌꺌"],
+    "totalCount": 10,
+    "sentences": ["어려워요group1", "재미있어요", "꺌꺌꺌"],
   },
   {
     "group": "group1",
     "keyword": "keyword2",
-    "totalCount": 30,
-    "sentences": ["어려워요2", "재미있어요2", "꺌꺌꺌2"],
+    "totalCount": 10,
+    "sentences": ["어려워요2group1", "재미있어요2", "꺌꺌꺌2"],
   },
   {
     "group": "group2",
     "keyword": "keyword1",
-    "totalCount": 30,
-    "sentences": ["어려워요", "재미있어요", "꺌꺌꺌"],
+    "totalCount": 20,
+    "sentences": ["어려워요group2", "재미있어요", "꺌꺌꺌"],
   },
   {
     "group": "group3",
     "keyword": "keyword1",
     "totalCount": 30,
-    "sentences": ["어려워요", "재미있어요", "꺌꺌꺌"],
+    "sentences": ["어려워요group3", "재미있어요", "꺌꺌꺌"],
   }
 ])
 // 삭제
