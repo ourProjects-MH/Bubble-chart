@@ -23,7 +23,21 @@ async function getTotalData() {
   let groupNameList = await getGroups()
   let result = {}
 
-  // 그룹 순회하며 하나씩 가져오기
+  // 키워드별 센텐스 빈 배열 생성
+  for (let i in groupNameList) {
+    const collections = await getDocs(collection(db, groupNameList[i]))
+    let docsInCollection = collections._snapshot.docChanges
+
+    for(let i=0; i< docsInCollection.length; i++) {
+      let path = docsInCollection[i].doc.key.path.segments
+      let keyword = path[path.length-1]
+
+      result[keyword] = {}
+      result[keyword]["sentences"] = []
+    }
+  }
+
+  // 키워드별 sentence 삽입 
   for (let i in groupNameList) {
     const collections = await getDocs(collection(db, groupNameList[i]))
     
@@ -33,13 +47,8 @@ async function getTotalData() {
       let path = docsInCollection[i].doc.key.path.segments
       let keyword = path[path.length-1]
 
-
-      result[keyword] = {}
-      result[keyword]["sentences"] = []
-
       let sentences = docsInCollection[i].doc.data.value.mapValue.fields
       
-      // result[keyword]["totalCount"] = sentences.totalCount.integerValue
       result[keyword]["totalCount"] = await getTotalCountByKeyword(keyword)
       
       sentences = Object.entries(sentences)
