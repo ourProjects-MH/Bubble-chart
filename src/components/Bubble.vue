@@ -1,7 +1,12 @@
 <template>
   <div>
     <div id="chart" class="chart"></div>
-    <SentenceModal :dialog="openModal" :selected_keyword="selected_keyword" :selected_sentences="selected_sentences" v-on:changeModal="changeModal" />
+    <SentenceModal 
+      :modal="modal" 
+      :selected_keyword="selected_keyword" 
+      :selected_sentences="selected_sentences" 
+      v-on:closeModal="closeModal" 
+    />
   </div>
 </template>
 
@@ -13,7 +18,10 @@ export default {
   name: "Bubble",
   data() {
     return {
-      openModal: false,
+      idx: 0,
+      max: null,
+      min: null,
+      modal: false,
       selected_keyword: null,
       selected_sentences: null,
     }
@@ -25,16 +33,11 @@ export default {
       },
     },
   },
-  computed: {
-  },
   components: {
     SentenceModal,
   },
   props: {
     children: Array,
-  },
-  created() {
-  
   },
   mounted() {
     this.make_bubble()
@@ -45,15 +48,14 @@ export default {
       if (!this.children) {
         return
       } 
+
       var json = { 'children': this.children.slice(0) }
       // name(string), sentences(array), value(int)
 
       const values = json.children.map(d => d.value);
 
-      const min = Math.min.apply(null, values);
-      const max = Math.max.apply(null, values);
-      
-      var idx = 1
+      this.min = Math.min.apply(null, values);
+      this.max = Math.max.apply(null, values);
 
       const diameter = 600;
 
@@ -78,65 +80,66 @@ export default {
         .attr('transform', function(d) { return 'translate(' + d.x + ' ' + d.y + ')'; })
         .append('g');
 
-      var vm = this;
-
       node.append("circle")
         .attr("r", function(d) { return d.r; })
-        .on("click", getSentences)
-        .style("fill", getItemColor)
+        .on("click", this.getSentences)
+        .style("fill", this.getItemColor)
 
       node.append("text")
         .style("text-anchor", "middle")
-        .style('font-size', getFontSizeForItem)
+        .style('font-size', this.getFontSizeForItem)
         .style("font-weight", "bolder")
-        .text(getLabel)
+        .text(this.getLabel)
         .style("fill", "#ffffff")
 
       node.append("text")
         .attr("dy", "1.2em")
         .style("text-anchor", "middle")
-        .style('font-size', getFontSizeForItem)
-        .text(getValueText)
+        .style('font-size', this.getFontSizeForItem)
+        .text(this.getValueText)
         .style("fill", "#ffffff")
-      
-        
-      function getLabel(item) {
-        return truncate(item.data.name);
-      }
-      function getValueText(item) {
-        return item.data.value;
-      }
-      function truncate(label) {
-        const max = 8;
-        if (label.length > max) {
-          label = label.slice(0, max) + '...';
-        }
-        return label;
-      }
-      function getFontSizeForItem(item) {
-        const minPx = 10;
-        const maxPx = 16;
-        const pxRange = maxPx - minPx; 
-        const dataRange = max - min;
-        const ratio = pxRange / dataRange;
-        const size = Math.min(maxPx, Math.round(item.data.value * ratio) + minPx);
-        return `${size}px`;
-      }
-      function getItemColor() {
-        const colorList = ["89B5AF", "DED9C4", "D57E7E", "8E806A"];
-        const color_length = colorList.length
-        var i = idx % color_length
-        idx += 1
-        return '#' + colorList[i];
-      }
-      function getSentences(item) {
-        vm.selected_keyword= item["target"]["__data__"]["data"]["name"]
-        vm.selected_sentences = item["target"]["__data__"]["data"]["sentences"]
-        vm.changeModal()
-      }
     },
-    changeModal() {
-      this.openModal = !this.openModal
+    getLabel(item) {
+      return this.truncate(item.data.name);
+    },
+    getValueText(item) {
+      return item.data.value;
+    },
+    truncate(label) {
+      const max = 8;
+      if (label.length > max) {
+        label = label.slice(0, max) + '...';
+      }
+      return label;
+    },
+    getFontSizeForItem(item) {
+      const minPx = 10;
+      const maxPx = 16;
+      const pxRange = maxPx - minPx; 
+      const dataRange = this.max - this.min;
+      const ratio = pxRange / dataRange;
+      const size = Math.min(maxPx, Math.round(item.data.value * ratio) + minPx);
+      return `${size}px`;
+    },
+    getItemColor() {
+      // const colorList = ["#FCE4C5", "#F89928", "#FDDEB5"];
+      // const color_length = colorList.length
+      // var i = this.idx % color_length
+      // this.idx += 1
+      return "#f48120";
+    },
+    getSentences(item) {
+      this.selected_keyword= item["target"]["__data__"]["data"]["name"]
+      this.selected_sentences = item["target"]["__data__"]["data"]["sentences"]
+      this.openModal()
+    },
+    openModal() {
+      this.modal = true
+    },
+    closeModal() {
+      this.modal = false
+      this.selected_keyword = null
+      this.selected_sentences = null
     },
   }
 }
@@ -157,7 +160,7 @@ export default {
   transition: transform 200ms ease-in-out;
 }
 .node:hover circle {
-  transform: scale(1.1);
+  transform: scale(1.05);
   filter: brightness(50%);
   cursor: pointer;
 }

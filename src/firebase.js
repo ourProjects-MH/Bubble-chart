@@ -256,7 +256,7 @@ async function getDataByGroups() {
   console.log("계급데이터", result)
   return result
 }
-getDataByGroups()
+// getDataByGroups()
 
 // 그룹 데이터 저장
 // function addGroups (groups) {
@@ -265,9 +265,10 @@ getDataByGroups()
 //   }
 // }
 // 비밀번호 저장
-// function setPassword (password) {
-//   setDoc(doc(db, "Password", "password"), {"password": password})
-// }
+function setPassword (password) {
+  deleteDoc(doc(db, "Password", "password"));
+  setDoc(doc(db, "Password", "password"), {"password": password})
+}
 // setPassword("admin")
 
 async function getPassword () {
@@ -373,7 +374,8 @@ async function getCurrentData() {
       }
     }
   }
-  console.log("getCurrentData result: ", result)
+  console.log("result: ", result)
+  return result
 }
 getCurrentData()
 // 키워드 삭제 api
@@ -394,32 +396,32 @@ getCurrentData()
 
 
 // addGroups(["group1", "group2", "group3"])
-setData([
-  {
-    "group": "group1",
-    "keyword": "keyword1",
-    "totalCount": 10,
-    "sentences": ["어려워요group1", "재미있어요", "꺌꺌꺌"],
-  },
-  {
-    "group": "group1",
-    "keyword": "keyword2",
-    "totalCount": 10,
-    "sentences": ["어려워요2group1", "재미있어요2", "꺌꺌꺌2"],
-  },
-  {
-    "group": "group2",
-    "keyword": "keyword1",
-    "totalCount": 20,
-    "sentences": ["어려워요group2", "재미있어요", "꺌꺌꺌"],
-  },
-  {
-    "group": "group3",
-    "keyword": "keyword1",
-    "totalCount": 30,
-    "sentences": ["어려워요group3", "재미있어요", "꺌꺌꺌"],
-  }
-])
+// setData([
+//   {
+//     "group": "group1",
+//     "keyword": "keyword1",
+//     "totalCount": 10,
+//     "sentences": ["어려워요group1", "재미있어요", "꺌꺌꺌"],
+//   },
+//   {
+//     "group": "group1",
+//     "keyword": "keyword2",
+//     "totalCount": 10,
+//     "sentences": ["어려워요2group1", "재미있어요2", "꺌꺌꺌2"],
+//   },
+//   {
+//     "group": "group2",
+//     "keyword": "keyword1",
+//     "totalCount": 20,
+//     "sentences": ["어려워요group2", "재미있어요", "꺌꺌꺌"],
+//   },
+//   {
+//     "group": "group3",
+//     "keyword": "keyword1",
+//     "totalCount": 30,
+//     "sentences": ["어려워요group3", "재미있어요", "꺌꺌꺌"],
+//   }
+// ])
 getTotalData()
 
 updateCount("group1", "keyword1", 0)
@@ -433,6 +435,7 @@ updateCount("group1", "keyword1", 0)
 // updateCount("임원", "팀플", 2, 1)
 
 
+export default { getTotalData, getGroups, getDataByGroups, getCurrentData, setData, getPassword, setPassword }
 
 
 

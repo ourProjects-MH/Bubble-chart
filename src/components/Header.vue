@@ -8,7 +8,7 @@
         class="flex"
         flat
         tile
-        style="background-color: #11324D;"
+        style="background-color: #f48120;"
       >
         <v-card-title>
           <strong class="subheading">Get connected with us on social networks!</strong>
