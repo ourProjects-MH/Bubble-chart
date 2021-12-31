@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Main from '../views/Main.vue'
 import Update from '../views/Update.vue'
+import PasswordChange from '../views/PasswordChange.vue'
 
 Vue.use(VueRouter)
 
@@ -15,6 +16,11 @@ const routes = [
     path: '/admin',
     name: 'Update',
     component: Update
+  },
+  {
+    path: '/changepassword',
+    name: 'PasswordChange',
+    component: PasswordChange
   },
 ]
 

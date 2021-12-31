@@ -22,7 +22,7 @@
           </v-btn>
           </div>
 
-          <v-card-text class="between no-padding-bottom" v-for="(sentence, idx) in selected_sentences" :key="sentence['sentence_id']" >
+          <v-card-text class="between no-padding-bottom" v-for="(sentence) in selected_sentences" :key="sentence['id']" >
             <div class="align-center">
               {{ sentence["sentence"] }}
             </div>
@@ -34,7 +34,11 @@
                 color="red lighten-2"
                 @click="likeSentence(sentence, idx)"
               >
-                <v-icon :id="selected_keyword + '-btn-'+ String(idx)">mdi-heart-outline</v-icon>
+                <v-icon 
+                  :id="'btn-'+ String(sentence['id'])"
+                >
+                  mdi-heart-outline
+                </v-icon>
               </v-btn>
               {{ sentence["sentence_count"] }}
             </div>
@@ -69,9 +73,9 @@ export default {
     closeModal() {
       this.$emit('closeModal')
     },
-    likeSentence(data, idx) {
+    likeSentence(data) {
      
-      var id = this.selected_keyword + "-btn-" + String(idx)
+      var id = "btn-" + String(data['id'])
       var btn = document.getElementById(id)
 
       // var group = data["sentence_group"]

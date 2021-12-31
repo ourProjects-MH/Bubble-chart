@@ -27,6 +27,9 @@ export default {
   name: "OpinionSession",
   props: {
     opinions: Array,
+    group1: String,
+    group2: String,
+    group3: String,
   },
   data() {
     return {
@@ -38,27 +41,9 @@ export default {
           sortable: false,
           value: 'name',
         },
-        { text: '임원', align: 'center', value: 'topmanager_rate' },
-        { text: '관리자', align: 'center', value: 'manager_rate' },
-        { text: '직원', align: 'center', value: 'employee_rate' },
-      ],
-      desserts: [
-        {
-          name: 'Work',
-          calories: 159,
-          fat: 6.0,
-          carbs: 24,
-          protein: 4.0,
-          iron: '1%',
-        },
-        {
-          name: 'Ice cream sandwich',
-          calories: 237,
-          fat: 9.0,
-          carbs: 37,
-          protein: 4.3,
-          iron: '1%',
-        },
+        { text: this.group1, align: 'center', value: 'group1_rate' },
+        { text: this.group2, align: 'center', value: 'group2_rate' },
+        { text: this.group3, align: 'center', value: 'group3_rate' },
       ],
     }
   }

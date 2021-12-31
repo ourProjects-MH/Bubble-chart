@@ -219,44 +219,44 @@ getTotalCountByKeyword("keyword1")
 // sentencesByKeyword("keyword1")
 
 // 계급데이터 가져오기
-// async function getDataByGroups() {
-//   let groupNameList = await getGroups()
-//   let result = {}
+async function getDataByGroups() {
+  let groupNameList = await getGroups()
+  let result = {}
 
-//   // 키워드당 빈 배열을 만들어주기
-//   for (let i in groupNameList) {
-//     const collections = await getDocs(collection(db, groupNameList[i]))
-//     let docsInCollection = collections._snapshot.docChanges
+  // 키워드당 빈 배열을 만들어주기
+  for (let i in groupNameList) {
+    const collections = await getDocs(collection(db, groupNameList[i]))
+    let docsInCollection = collections._snapshot.docChanges
     
-//     for(let i=0; i< docsInCollection.length; i++) {
-//       let path = docsInCollection[i].doc.key.path.segments
-//       let keyword = path[path.length-1]
-//       result[keyword] = {}
-//     }
-//   }
+    for(let i=0; i< docsInCollection.length; i++) {
+      let path = docsInCollection[i].doc.key.path.segments
+      let keyword = path[path.length-1]
+      result[keyword] = {}
+    }
+  }
 
-//   // 그룹 순회하며 하나씩 가져오기
-//   for (let i in groupNameList) {
-//     const collections = await getDocs(collection(db, groupNameList[i]))
-//     let group = groupNameList[i]
-//     let docsInCollection = collections._snapshot.docChanges
+  // 그룹 순회하며 하나씩 가져오기
+  for (let i in groupNameList) {
+    const collections = await getDocs(collection(db, groupNameList[i]))
+    let group = groupNameList[i]
+    let docsInCollection = collections._snapshot.docChanges
     
-//     // 해당 그룹안에 있는 docs(키워드) 순회
-//     for(let i=0; i< docsInCollection.length; i++) {
-//       let path = docsInCollection[i].doc.key.path.segments
-//       let keyword = path[path.length-1]
+    // 해당 그룹안에 있는 docs(키워드) 순회
+    for(let i=0; i< docsInCollection.length; i++) {
+      let path = docsInCollection[i].doc.key.path.segments
+      let keyword = path[path.length-1]
 
-//       // let pushData = {}
-//       let value = await getTotalCountByKeyword(keyword)
-//       result[keyword][group] = value
-//       // pushData[group] = value
-//       // console.log(pushData)
-//       // result[keyword].push(pushData)
-//     }
-//   }
-//   console.log("계급데이터", result)
-//   return result
-// }
+      // let pushData = {}
+      let value = await getTotalCountByKeyword(keyword)
+      result[keyword][group] = value
+      // pushData[group] = value
+      // console.log(pushData)
+      // result[keyword].push(pushData)
+    }
+  }
+  console.log("계급데이터", result)
+  return result
+}
 // getDataByGroups()
 
 // 그룹 데이터 저장
@@ -266,10 +266,10 @@ getTotalCountByKeyword("keyword1")
 //   }
 // }
 // 비밀번호 저장
-// function setPassword (password) {
-//   setDoc(doc(db, "Password", "password"), {"password": password})
-// }
-// setPassword("admin")
+function setPassword (password) {
+  setDoc(doc(db, "Password", "password"), {"password": password})
+}
+setPassword("admin")
 
 async function getPassword () {
   let passwordDoc = await getDoc(doc(db, "Password", "password"))
@@ -395,32 +395,32 @@ getCurrentData()
 
 
 // addGroups(["group1", "group2", "group3"])
-setData([
-  {
-    "group": "group1",
-    "keyword": "keyword1",
-    "totalCount": 10,
-    "sentences": ["어려워요group1", "재미있어요", "꺌꺌꺌"],
-  },
-  {
-    "group": "group1",
-    "keyword": "keyword2",
-    "totalCount": 10,
-    "sentences": ["어려워요2group1", "재미있어요2", "꺌꺌꺌2"],
-  },
-  {
-    "group": "group2",
-    "keyword": "keyword1",
-    "totalCount": 20,
-    "sentences": ["어려워요group2", "재미있어요", "꺌꺌꺌"],
-  },
-  {
-    "group": "group3",
-    "keyword": "keyword1",
-    "totalCount": 30,
-    "sentences": ["어려워요group3", "재미있어요", "꺌꺌꺌"],
-  }
-])
+// setData([
+//   {
+//     "group": "group1",
+//     "keyword": "keyword1",
+//     "totalCount": 10,
+//     "sentences": ["어려워요group1", "재미있어요", "꺌꺌꺌"],
+//   },
+//   {
+//     "group": "group1",
+//     "keyword": "keyword2",
+//     "totalCount": 10,
+//     "sentences": ["어려워요2group1", "재미있어요2", "꺌꺌꺌2"],
+//   },
+//   {
+//     "group": "group2",
+//     "keyword": "keyword1",
+//     "totalCount": 20,
+//     "sentences": ["어려워요group2", "재미있어요", "꺌꺌꺌"],
+//   },
+//   {
+//     "group": "group3",
+//     "keyword": "keyword1",
+//     "totalCount": 30,
+//     "sentences": ["어려워요group3", "재미있어요", "꺌꺌꺌"],
+//   }
+// ])
 getTotalData()
 
 updateCount("group1", "keyword1", 0)
@@ -434,6 +434,7 @@ updateCount("group1", "keyword1", 0)
 // updateCount("임원", "팀플", 2, 1)
 
 
+export default { getTotalData, getGroups, getDataByGroups, getCurrentData, setData, getPassword, setPassword }
 
 
 

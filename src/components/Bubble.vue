@@ -82,7 +82,6 @@ export default {
 
       node.append("circle")
         .attr("r", function(d) { return d.r; })
-        // .on("click", getSentences)
         .on("click", this.getSentences)
         .style("fill", this.getItemColor)
 
@@ -161,7 +160,7 @@ export default {
   transition: transform 200ms ease-in-out;
 }
 .node:hover circle {
-  transform: scale(1.1);
+  transform: scale(1.05);
   filter: brightness(50%);
   cursor: pointer;
 }
