@@ -67,7 +67,6 @@ async function getTotalData() {
       }
     }
   }
-  console.log("버블데이터", result)
   return result
 }
 
@@ -140,7 +139,6 @@ async function deleteOriginalData() {
 
 // 데이터 추가
 async function setData(dataCollection) {
-  console.log(dataCollection)
   // 그룹이랑 키워드 collection 돌면서 다 삭제한다.
   // 만약 키워드 네임을 수정했을 경우, 기존 키워드는 컬렉션에 남아있음.
   // 하지만 문제될거는 없을 것 같음
@@ -201,7 +199,6 @@ async function getTotalCountByKeyword(keyword) {
   })
   return result
 }
-getTotalCountByKeyword("keyword1")
 
 // 키워드별 문장들
 // async function sentencesByKeyword(keyword) {
@@ -253,7 +250,6 @@ async function getDataByGroups() {
       // result[keyword].push(pushData)
     }
   }
-  console.log("계급데이터", result)
   return result
 }
 // getDataByGroups()
@@ -275,14 +271,6 @@ async function getPassword () {
   let passwordDoc = await getDoc(doc(db, "Password", "password"))
   return passwordDoc.data().password
 }
-getPassword()
-
-// 비밀번호 수정
-// function updatePassword(newPassword) {
-//   deleteDoc(doc(db, "Password", "password"));
-//   setDoc(doc(db, "Password", "password"), {"password": newPassword})
-// }
-// updatePassword("admin2")
 
 // 그룹 가져오는 api
 async function getGroups() {
@@ -304,8 +292,10 @@ async function updateCount(group, keyword, sentenceId) {
   const findDoc = await getDoc(doc(db, group, keyword))
   let changeContent = {}
 
+  console.log(findDoc.data())
   let fieldToModify = findDoc.data()[sentenceId]
     
+    console.log(fieldToModify)
     let cur_group = fieldToModify["group"]
     let cur_sentence = fieldToModify["sentence"]
     let cur_count = (parseInt(fieldToModify["count"]) + 1)
@@ -315,11 +305,8 @@ async function updateCount(group, keyword, sentenceId) {
       "group": cur_group,
       "sentence": cur_sentence
     }
-
     updateDoc(doc(db, group, keyword), changeContent)
-  
-  console.log("changeContent: ", changeContent)
-
+    console.log(changeContent)
 }
 
 // ======= 수정할 때 보여줄 데이터 ======
@@ -374,10 +361,9 @@ async function getCurrentData() {
       }
     }
   }
-  console.log("result: ", result)
   return result
 }
-getCurrentData()
+
 // 키워드 삭제 api
 // function deleteKeyword(group, keyword) {
 //   deleteDoc(doc(db, group, keyword));
@@ -394,48 +380,7 @@ getCurrentData()
 // }
 
 
-
-// addGroups(["group1", "group2", "group3"])
-// setData([
-//   {
-//     "group": "group1",
-//     "keyword": "keyword1",
-//     "totalCount": 10,
-//     "sentences": ["어려워요group1", "재미있어요", "꺌꺌꺌"],
-//   },
-//   {
-//     "group": "group1",
-//     "keyword": "keyword2",
-//     "totalCount": 10,
-//     "sentences": ["어려워요2group1", "재미있어요2", "꺌꺌꺌2"],
-//   },
-//   {
-//     "group": "group2",
-//     "keyword": "keyword1",
-//     "totalCount": 20,
-//     "sentences": ["어려워요group2", "재미있어요", "꺌꺌꺌"],
-//   },
-//   {
-//     "group": "group3",
-//     "keyword": "keyword1",
-//     "totalCount": 30,
-//     "sentences": ["어려워요group3", "재미있어요", "꺌꺌꺌"],
-//   }
-// ])
-getTotalData()
-
-updateCount("group1", "keyword1", 0)
-updateCount("group1", "keyword1", 0)
-updateCount("group1", "keyword1", 0)
-// 삭제
-// deleteKeyword("임원", "팀플")
-// deleteDocs("Groups")
-// 카운트 수정
-// updateCount("임원", "분담", 2, 1)
-// updateCount("임원", "팀플", 2, 1)
-
-
-export default { getTotalData, getGroups, getDataByGroups, getCurrentData, setData, getPassword, setPassword }
+export default { getTotalData, getGroups, getDataByGroups, getCurrentData, setData, getPassword, setPassword, updateCount }
 
 
 

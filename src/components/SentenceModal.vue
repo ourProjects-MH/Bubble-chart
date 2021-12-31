@@ -55,7 +55,7 @@
 </template>
 
 <script>
-// import firebase from "@/firebase.js"
+import firebase from "@/firebase.js"
 
 export default {
   data () {
@@ -78,18 +78,16 @@ export default {
       var id = "btn-" + String(data['id'])
       var btn = document.getElementById(id)
 
-      // var group = data["sentence_group"]
-      // var count = parseInt(data["sentence_count"])+1
+      var group = data["sentence_group"]
       if (btn.classList.contains("mdi-heart")) {
         alert('이미 좋아요를 누르셨습니다.')
         return
       }
-      // firebase.updateCount(group, this.selected_keyword, id, count)
+      firebase.updateCount(group, this.selected_keyword, parseInt(data["sentence_id"]))
       data["sentence_count"] = parseInt(data["sentence_count"])+1
-      // console.log(btn)
-      // btn.innerHTML = "mdi-heart"
       btn.classList.remove("mdi-heart-outline")
       btn.classList += " mdi-heart"
+      console.log(group, this.selected_keyword,data, parseInt(data["sentence_id"]))
       // btn을 x후 페이지 리렌더링을 하지 않으면 같은 인덱스 번호를 가진 btn icon이 같이 바뀜
     }
   }
