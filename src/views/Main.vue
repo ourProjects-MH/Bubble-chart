@@ -90,6 +90,7 @@ export default {
       const loaddata = firebase.getDataByGroups()
       var data = []
       loaddata.then((res) => {
+        console.log(res)
         loadgroups.then((groups) => {
           this.group1 = groups[0]
           this.group2 = groups[1]

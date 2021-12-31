@@ -151,26 +151,32 @@ export default {
     fetchData() {
       const loadgroups = firebase.getGroups()
       const loaddata = firebase.getCurrentData()
-      loadgroups.then((groups) => {
-        this.group1 = groups[0]
-        this.group2 = groups[1]
-        this.group3 = groups[2]
-      })
+      
       loaddata.then((res) => {
-        console.log(res)
-        // for (var el in res) {
-          //   console.log(el)
-        //   var sentences = []
-        //   for (var i in res[el]["sentences"]) {
-        //     sentences.push(res[el]["sentences"][i]["sentence"])
-        //   }
-        //   this.data_collections.push({
-          //     keyword: el,
-        //     group: this.group1,
-        //     totalcount: res[el]["totalCount"],
-        //     sentences: sentences,
-        //   })
-        // }
+        loadgroups.then((groups) => {
+          this.group1 = groups[0]
+          this.group2 = groups[1]
+          this.group3 = groups[2]
+
+          for (var keyword in res) {
+            for (var group in res[keyword]) {
+              console.log(group)
+              this.data_collections.push({
+                keyword: keyword,
+                group: group,
+                totalcount: res[keyword][group]["totalCount"],
+                sentences: res[keyword][group]["sentences"],
+              })
+              console.log(this.data_collections)
+            }
+            // var sentences = []
+            // for (var i in res[el]["sentences"]) {
+            //   sentences.push(res[el]["sentences"][i]["sentence"])
+            // }
+          }
+
+        })
+      
       })
     },
     addData () {

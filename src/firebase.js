@@ -245,10 +245,9 @@ async function getDataByGroups() {
     for(let i=0; i< docsInCollection.length; i++) {
       let path = docsInCollection[i].doc.key.path.segments
       let keyword = path[path.length-1]
-
       // let pushData = {}
-      let value = await getTotalCountByKeyword(keyword)
-      result[keyword][group] = value
+      let value = docsInCollection[i].doc.data.value.mapValue.fields
+      result[keyword][group] = value["totalCount"].integerValue
       // pushData[group] = value
       // console.log(pushData)
       // result[keyword].push(pushData)
@@ -267,9 +266,10 @@ async function getDataByGroups() {
 // }
 // 비밀번호 저장
 function setPassword (password) {
+  deleteDoc(doc(db, "Password", "password"));
   setDoc(doc(db, "Password", "password"), {"password": password})
 }
-setPassword("admin")
+// setPassword("admin")
 
 async function getPassword () {
   let passwordDoc = await getDoc(doc(db, "Password", "password"))
@@ -375,6 +375,7 @@ async function getCurrentData() {
     }
   }
   console.log("result: ", result)
+  return result
 }
 getCurrentData()
 // 키워드 삭제 api
