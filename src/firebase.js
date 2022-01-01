@@ -7,18 +7,18 @@ import { setDoc } from "firebase/firestore"
 import { collection, getDocs } from "firebase/firestore";
 import {  updateDoc, getDoc, increment } from "firebase/firestore";
 initializeApp({
-  apiKey: "AIzaSyCKZQz6LPTVvBzbG4gWiFW_mv_A-Gvqo7k",
-  authDomain: "bubble-chart-89dd0.firebaseapp.com",
-  projectId: "bubble-chart-89dd0",
-  storageBucket: "bubble-chart-89dd0.appspot.com",
-  messagingSenderId: "931764363139",
-  appId: "1:931764363139:web:178bbd4673864d589660b6",
-  measurementId: "${config.measurementId}"
+  apiKey: "AIzaSyBezh5BUdyo8UCoTPkenhnBlveMZBpCgo4",
+  authDomain: "bubble-chart-2f9c3.firebaseapp.com",
+  projectId: "bubble-chart-2f9c3",
+  storageBucket: "bubble-chart-2f9c3.appspot.com",
+  messagingSenderId: "1008573436899",
+  appId: "1:1008573436899:web:3fbf6c3194bd0d1e4c46d6",
+  measurementId: "G-S5JKGNE3YX"
 });
 
 const db = getFirestore();
 
-// 데이터 반환
+// 버블 데이터 반환
 async function getTotalData() {
   let groupNameList = await getGroups()
   let result = {}
@@ -69,54 +69,15 @@ async function getTotalData() {
   }
   return result
 }
-
-// export default {
-//   getTotalData: async function() {
-//     let groupNameList = await getGroups()
-//     let result = {}
-    
-//     // 그룹 순회하며 하나씩 가져오기
-//     for (let i in groupNameList) {
-//       const collections = await getDocs(collection(db, groupNameList[i]))
-      
-//       let docsInCollection = collections._snapshot.docChanges
-//         // 해당 그룹안에 있는 docs(키워드) 순회
-//       for(let i=0; i< docsInCollection.length; i++) {
-//         let path = docsInCollection[i].doc.key.path.segments
-//         let keyword = path[path.length-1]
-  
-//         result[keyword] = {}
-//         result[keyword]["sentences"] = []
-  
-//         let sentences = docsInCollection[i].doc.data.value.mapValue.fields
-//         result[keyword]["totalCount"] = sentences.totalCount.integerValue
-  
-//         sentences = Object.entries(sentences)
-        
-//         for (let j=0; j<sentences.length-1; j++) {
-//           let sub = {}
-//           let countValue = sentences[j][1].mapValue.fields.count.integerValue
-//           let group = sentences[j][1].mapValue.fields.group.stringValue
-//           let sentence = sentences[j][1].mapValue.fields.sentence.stringValue
-  
-//           sub["sentence"] = sentence
-//           sub["group"] = group
-//           sub["count"] = countValue
-//           sub["id"] = j
-//           result[keyword]["sentences"].push(sub)
-//         }
-//         console.log("=====", result)
-//       }
-//     }
-//     return result
-//   }
-// }
-
-// 기존 데이터 삭제
+getTotalData()
+// // 기존 데이터(키워드, 그룹) 삭제
 async function deleteOriginalData() {
   let removeList = []
   for (let word of ["Groups", "Keywords"]) {
     const collections = await getDocs(collection(db, word))
+    // collections.forEach((document) => {
+    //   removeList.push(document.id)
+    // })
     let docsInCollection = collections._snapshot.docChanges
   
     for(let i=0; i< docsInCollection.length; i++) {
@@ -127,6 +88,10 @@ async function deleteOriginalData() {
   }
   for (let word of removeList) {
     const collections = await getDocs(collection(db, word))
+    // collections.forEach(async (document) => {
+    //   console.log(document.id)
+    //   deleteDoc(doc(db, word, document.id))
+    // })
     let docsInCollection = collections._snapshot.docChanges
   
     for(let i=0; i< docsInCollection.length; i++) {
@@ -139,15 +104,11 @@ async function deleteOriginalData() {
 
 // 데이터 추가
 async function setData(dataCollection) {
-  // 그룹이랑 키워드 collection 돌면서 다 삭제한다.
-  // 만약 키워드 네임을 수정했을 경우, 기존 키워드는 컬렉션에 남아있음.
-  // 하지만 문제될거는 없을 것 같음
-  // 그룹만 변동사항 없으면 될 것 같음.
-  // 키워드 컬렉션 하나 만들어서 키워드 넣기.
+  let keywords = []
   
   // 기존 데이터 삭제
   await deleteOriginalData()
-  let keywords = []
+
   // 그룹별로 저장
   for (let i in dataCollection) {
     
@@ -200,20 +161,6 @@ async function getTotalCountByKeyword(keyword) {
   return result
 }
 
-// 키워드별 문장들
-// async function sentencesByKeyword(keyword) {
-//   let result = {}
-//   const collections = await getDocs(collection(db, keyword))
-//   collections.forEach((document) => {
-//     let path = document._key.path.segments
-//     let group = path[path.length-1]
-
-//     let sentences = document.data().sentences
-//     result[group] = sentences
-//   })
-//   return result
-// }
-// sentencesByKeyword("keyword1")
 
 // 계급데이터 가져오기
 async function getDataByGroups() {
@@ -223,67 +170,57 @@ async function getDataByGroups() {
   // 키워드당 빈 배열을 만들어주기
   for (let i in groupNameList) {
     const collections = await getDocs(collection(db, groupNameList[i]))
-    let docsInCollection = collections._snapshot.docChanges
-    
-    for(let i=0; i< docsInCollection.length; i++) {
-      let path = docsInCollection[i].doc.key.path.segments
-      let keyword = path[path.length-1]
-      result[keyword] = {}
-    }
+    collections.forEach((document) => {
+      result[document.id] = {}
+    })
   }
 
   // 그룹 순회하며 하나씩 가져오기
   for (let i in groupNameList) {
     const collections = await getDocs(collection(db, groupNameList[i]))
     let group = groupNameList[i]
-    let docsInCollection = collections._snapshot.docChanges
-    
-    // 해당 그룹안에 있는 docs(키워드) 순회
-    for(let i=0; i< docsInCollection.length; i++) {
-      let path = docsInCollection[i].doc.key.path.segments
-      let keyword = path[path.length-1]
-      // let pushData = {}
-      let value = docsInCollection[i].doc.data.value.mapValue.fields
-      result[keyword][group] = value["totalCount"].integerValue
-      // pushData[group] = value
-      // console.log(pushData)
-      // result[keyword].push(pushData)
-    }
+    collections.forEach((document) => {
+      let keyword = document.id
+      result[keyword][group] = document.data().totalCount
+    })
   }
   return result
 }
-// getDataByGroups()
 
-// 그룹 데이터 저장
-// function addGroups (groups) {
-//   for (let group in groups) {
-//     setDoc(doc(db, "Groups", groups[group]), {"groupName": groups[group]})
-//   }
-// }
-// 비밀번호 저장
+// 비밀번호 수정/저장
 function setPassword (password) {
   deleteDoc(doc(db, "Password", "password"));
   setDoc(doc(db, "Password", "password"), {"password": password})
 }
-// setPassword("admin")
 
 async function getPassword () {
   let passwordDoc = await getDoc(doc(db, "Password", "password"))
   return passwordDoc.data().password
 }
 
+// 그룹 데이터 저장
+async function setGroups (groups) {
+  // 원래 있던 그룹들 삭제
+  const collections = await getDocs(collection(db, "Groups"))
+  collections.forEach((document) => {
+    deleteDoc(doc(db, "Groups", document.data().groupName))
+  })
+  // 들어온 그룹으로 설정
+  for (let group of groups) {
+    setDoc(doc(db, "Groups", group), {"groupName": group})
+  }
+}
+// setGroups(["임원&실장", "중간관리자&팀장", "팀원"])
+
 // 그룹 가져오는 api
 async function getGroups() {
   let groups = {}
+  let groupNumber = 0
   const collections = await getDocs(collection(db, "Groups"))
-
-  let docsInCollection = collections._snapshot.docChanges
-
-  // 해당 그룹안에 있는 docs(키워드) 순회
-  for(let i=0; i< docsInCollection.length; i++) {
-    let groupName = docsInCollection[i].doc.data.value.mapValue.fields.groupName.stringValue
-    groups[i] = groupName
-  }
+  collections.forEach((document) => {
+    groups[groupNumber] = document.data().groupName
+    groupNumber += 1
+  })
   return groups
 }
 
@@ -292,10 +229,8 @@ async function updateCount(group, keyword, sentenceId) {
   const findDoc = await getDoc(doc(db, group, keyword))
   let changeContent = {}
 
-  console.log(findDoc.data())
   let fieldToModify = findDoc.data()[sentenceId]
     
-    console.log(fieldToModify)
     let cur_group = fieldToModify["group"]
     let cur_sentence = fieldToModify["sentence"]
     let cur_count = (parseInt(fieldToModify["count"]) + 1)
@@ -305,16 +240,10 @@ async function updateCount(group, keyword, sentenceId) {
       "group": cur_group,
       "sentence": cur_sentence
     }
-    updateDoc(doc(db, group, keyword), changeContent)
-    console.log(changeContent)
-}
 
-// ======= 수정할 때 보여줄 데이터 ======
-// 키워드1 : {
-//   직급1,
-//   토탈카운트,
-//   문장
-//   }
+    updateDoc(doc(db, group, keyword), changeContent)
+  
+}
 
 async function getCurrentData() {
   // 키워드 배열 생성
@@ -325,63 +254,29 @@ async function getCurrentData() {
   // 키워드당 빈 배열을 만들어주기
   for (let i in groupNameList) {
     const collections = await getDocs(collection(db, groupNameList[i]))
-    let docsInCollection = collections._snapshot.docChanges
-    
-    for(let i=0; i< docsInCollection.length; i++) {
-      let path = docsInCollection[i].doc.key.path.segments
-      let keyword = path[path.length-1]
+    collections.forEach((document) => {
+      let keyword = document.id
       keywordList.push(keyword)
       result[keyword] = {}
-    }
+    })
   }
+
   // 키워드 중복 제거
   keywordList = Array.from(new Set(keywordList))
 
   // 그룹 순회하며 하나씩 가져오기
-  for (let i in keywordList) {
-    const collections = await getDocs(collection(db, keywordList[i]))
-    let keyword = keywordList[i]
-    let docsInCollection = collections._snapshot.docChanges
-
-    // 해당 그룹안에 있는 docs(키워드) 순회
-    for(let i=0; i< docsInCollection.length; i++) {
-      let path = docsInCollection[i].doc.key.path.segments
-      let group = path[path.length-1]
-      let fieldsInDoc = docsInCollection[i].doc.data.value.mapValue.fields
-
-      let totalCount = fieldsInDoc.totalCount.integerValue
-      let sentencesObject = fieldsInDoc.sentences.arrayValue.values
-      let sentences = []
-      for (let i in sentencesObject) {
-        sentences.push(sentencesObject[i].stringValue)
-      }
+  for (let keyword of keywordList) {
+    const collections = await getDocs(collection(db, keyword))
+    collections.forEach((document) => {
+      let group = document.id
       result[keyword][group] = {
-        "totalCount": totalCount,
-        "sentences": sentences
+        "totalCount": document.data().totalCount,
+        "sentences": document.data().sentences
       }
-    }
+    })
   }
+  console.log(result)
   return result
 }
-
-// 키워드 삭제 api
-// function deleteKeyword(group, keyword) {
-//   deleteDoc(doc(db, group, keyword));
-// }
-
-// docs 데이터 삭제
-// async function deleteDocs(collectionName) {
-//   const collections = await getDocs(collection(db, collectionName))
-
-//   collections.forEach((document) => {
-//     console.log(document.data().group)
-//     deleteDoc(doc(db, collectionName, document.data().groupName));
-//   })
-// }
-
-
-export default { getTotalData, getGroups, getDataByGroups, getCurrentData, setData, getPassword, setPassword, updateCount }
-
-
-
-
+getCurrentData()
+export default { getTotalData, getGroups, getDataByGroups, getCurrentData, setData, getPassword, setPassword, updateCount, setGroups }
