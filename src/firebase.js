@@ -1,3 +1,4 @@
+
 import { initializeApp } from "firebase/app"
 import { deleteDoc, getFirestore } from "firebase/firestore"
 // import { getDocs, collection } from "firebase/firestore"
@@ -7,13 +8,21 @@ import { setDoc } from "firebase/firestore"
 import { collection, getDocs } from "firebase/firestore";
 import {  updateDoc, getDoc, increment } from "firebase/firestore";
 initializeApp({
-  apiKey: "AIzaSyCKZQz6LPTVvBzbG4gWiFW_mv_A-Gvqo7k",
-  authDomain: "bubble-chart-89dd0.firebaseapp.com",
-  projectId: "bubble-chart-89dd0",
-  storageBucket: "bubble-chart-89dd0.appspot.com",
-  messagingSenderId: "931764363139",
-  appId: "1:931764363139:web:178bbd4673864d589660b6",
-  measurementId: "${config.measurementId}"
+  apiKey: "AIzaSyBezh5BUdyo8UCoTPkenhnBlveMZBpCgo4",
+  authDomain: "bubble-chart-2f9c3.firebaseapp.com",
+  projectId: "bubble-chart-2f9c3",
+  storageBucket: "bubble-chart-2f9c3.appspot.com",
+  messagingSenderId: "1008573436899",
+  appId: "1:1008573436899:web:3fbf6c3194bd0d1e4c46d6",
+  measurementId: "G-S5JKGNE3YX"
+
+  // apiKey: "AIzaSyCKZQz6LPTVvBzbG4gWiFW_mv_A-Gvqo7k",
+  // authDomain: "bubble-chart-89dd0.firebaseapp.com",
+  // projectId: "bubble-chart-89dd0",
+  // storageBucket: "bubble-chart-89dd0.appspot.com",
+  // messagingSenderId: "931764363139",
+  // appId: "1:931764363139:web:178bbd4673864d589660b6",
+  // measurementId: "${config.measurementId}"
 });
 
 const db = getFirestore();
@@ -70,7 +79,7 @@ async function getTotalData() {
   return result
 }
 
-// 기존 데이터 삭제
+// // 기존 데이터 삭제
 async function deleteOriginalData() {
   let removeList = []
   for (let word of ["Groups", "Keywords"]) {
@@ -152,7 +161,6 @@ async function getTotalCountByKeyword(keyword) {
   })
   return result
 }
-getTotalCountByKeyword("keyword1")
 
 
 // 계급데이터 가져오기
@@ -190,7 +198,7 @@ async function getDataByGroups() {
   return result
 }
 
-// 비밀번호 저장
+// 비밀번호 수정/저장
 function setPassword (password) {
   deleteDoc(doc(db, "Password", "password"));
   setDoc(doc(db, "Password", "password"), {"password": password})
@@ -201,21 +209,32 @@ async function getPassword () {
   return passwordDoc.data().password
 }
 
+// 그룹 데이터 저장
+async function setGroups (groups) {
+  // 원래 있던 그룹들 삭제
+  const collections = await getDocs(collection(db, "Groups"))
+  collections.forEach((document) => {
+    deleteDoc(doc(db, "Groups", document.data().groupName))
+  })
+  // 들어온 그룹으로 설정
+  for (let group of groups) {
+    setDoc(doc(db, "Groups", group), {"groupName": group})
+  }
+}
+setGroups(["임원&실장", "중간관리자&팀장", "팀원"])
+
 // 그룹 가져오는 api
 async function getGroups() {
   let groups = {}
+  let groupNumber = 0
   const collections = await getDocs(collection(db, "Groups"))
-
-  let docsInCollection = collections._snapshot.docChanges
-
-  // 해당 그룹안에 있는 docs(키워드) 순회
-  for(let i=0; i< docsInCollection.length; i++) {
-    let groupName = docsInCollection[i].doc.data.value.mapValue.fields.groupName.stringValue
-    groups[i] = groupName
-  }
+  collections.forEach((document) => {
+    groups[groupNumber] = document.data().group
+    groupNumber += 1
+  })
   return groups
 }
-
+// getGroups()
 // 카운트 수정
 async function updateCount(group, keyword, sentenceId) {
   const findDoc = await getDoc(doc(db, group, keyword))
@@ -244,16 +263,19 @@ async function getCurrentData() {
   let keywordList = []
 
   // 키워드당 빈 배열을 만들어주기
-  for (let i in groupNameList) {
-    const collections = await getDocs(collection(db, groupNameList[i]))
-    let docsInCollection = collections._snapshot.docChanges
+  for (let group in groupNameList) {
+    const collections = await getDocs(collection(db, group))
+    collections.forEach((document) => {
+      console.log(document.data())
+    })
+    // let docsInCollection = collections._snapshot.docChanges
     
-    for(let i=0; i< docsInCollection.length; i++) {
-      let path = docsInCollection[i].doc.key.path.segments
-      let keyword = path[path.length-1]
-      keywordList.push(keyword)
-      result[keyword] = {}
-    }
+    // for(let i=0; i< docsInCollection.length; i++) {
+    //   let path = docsInCollection[i].doc.key.path.segments
+    //   let keyword = path[path.length-1]
+    //   keywordList.push(keyword)
+    //   result[keyword] = {}
+    // }
   }
   // 키워드 중복 제거
   keywordList = Array.from(new Set(keywordList))
@@ -285,4 +307,4 @@ async function getCurrentData() {
   return result
 }
 
-export default { getTotalData, getGroups, getDataByGroups, getCurrentData, setData, getPassword, setPassword }
+export default { getTotalData, getGroups, getDataByGroups, getCurrentData, setData, getPassword, setPassword, updateCount }
