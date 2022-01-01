@@ -1,4 +1,3 @@
-
 import { initializeApp } from "firebase/app"
 import { deleteDoc, getFirestore } from "firebase/firestore"
 // import { getDocs, collection } from "firebase/firestore"
@@ -15,19 +14,11 @@ initializeApp({
   messagingSenderId: "1008573436899",
   appId: "1:1008573436899:web:3fbf6c3194bd0d1e4c46d6",
   measurementId: "G-S5JKGNE3YX"
-
-  // apiKey: "AIzaSyCKZQz6LPTVvBzbG4gWiFW_mv_A-Gvqo7k",
-  // authDomain: "bubble-chart-89dd0.firebaseapp.com",
-  // projectId: "bubble-chart-89dd0",
-  // storageBucket: "bubble-chart-89dd0.appspot.com",
-  // messagingSenderId: "931764363139",
-  // appId: "1:931764363139:web:178bbd4673864d589660b6",
-  // measurementId: "${config.measurementId}"
 });
 
 const db = getFirestore();
 
-// 데이터 반환
+// 버블 데이터 반환
 async function getTotalData() {
   let groupNameList = await getGroups()
   let result = {}
@@ -78,12 +69,15 @@ async function getTotalData() {
   }
   return result
 }
-
-// // 기존 데이터 삭제
+getTotalData()
+// // 기존 데이터(키워드, 그룹) 삭제
 async function deleteOriginalData() {
   let removeList = []
   for (let word of ["Groups", "Keywords"]) {
     const collections = await getDocs(collection(db, word))
+    // collections.forEach((document) => {
+    //   removeList.push(document.id)
+    // })
     let docsInCollection = collections._snapshot.docChanges
   
     for(let i=0; i< docsInCollection.length; i++) {
@@ -94,6 +88,10 @@ async function deleteOriginalData() {
   }
   for (let word of removeList) {
     const collections = await getDocs(collection(db, word))
+    // collections.forEach(async (document) => {
+    //   console.log(document.id)
+    //   deleteDoc(doc(db, word, document.id))
+    // })
     let docsInCollection = collections._snapshot.docChanges
   
     for(let i=0; i< docsInCollection.length; i++) {
@@ -106,10 +104,11 @@ async function deleteOriginalData() {
 
 // 데이터 추가
 async function setData(dataCollection) {
+  let keywords = []
   
   // 기존 데이터 삭제
   await deleteOriginalData()
-  let keywords = []
+
   // 그룹별로 저장
   for (let i in dataCollection) {
     
@@ -171,29 +170,19 @@ async function getDataByGroups() {
   // 키워드당 빈 배열을 만들어주기
   for (let i in groupNameList) {
     const collections = await getDocs(collection(db, groupNameList[i]))
-    let docsInCollection = collections._snapshot.docChanges
-    
-    for(let i=0; i< docsInCollection.length; i++) {
-      let path = docsInCollection[i].doc.key.path.segments
-      let keyword = path[path.length-1]
-      result[keyword] = {}
-    }
+    collections.forEach((document) => {
+      result[document.id] = {}
+    })
   }
 
   // 그룹 순회하며 하나씩 가져오기
   for (let i in groupNameList) {
     const collections = await getDocs(collection(db, groupNameList[i]))
     let group = groupNameList[i]
-    let docsInCollection = collections._snapshot.docChanges
-    
-    // 해당 그룹안에 있는 docs(키워드) 순회
-    for(let i=0; i< docsInCollection.length; i++) {
-      let path = docsInCollection[i].doc.key.path.segments
-      let keyword = path[path.length-1]
-
-      let value = docsInCollection[i].doc.data.value.mapValue.fields
-      result[keyword][group] = value["totalCount"].integerValue
-    }
+    collections.forEach((document) => {
+      let keyword = document.id
+      result[keyword][group] = document.data().totalCount
+    })
   }
   return result
 }
@@ -221,7 +210,7 @@ async function setGroups (groups) {
     setDoc(doc(db, "Groups", group), {"groupName": group})
   }
 }
-setGroups(["임원&실장", "중간관리자&팀장", "팀원"])
+// setGroups(["임원&실장", "중간관리자&팀장", "팀원"])
 
 // 그룹 가져오는 api
 async function getGroups() {
@@ -232,10 +221,9 @@ async function getGroups() {
     groups[groupNumber] = document.data().groupName
     groupNumber += 1
   })
-  console.log(groups)
   return groups
 }
-// getGroups()
+
 // 카운트 수정
 async function updateCount(group, keyword, sentenceId) {
   const findDoc = await getDoc(doc(db, group, keyword))
@@ -264,48 +252,31 @@ async function getCurrentData() {
   let keywordList = []
 
   // 키워드당 빈 배열을 만들어주기
-  for (let group in groupNameList) {
-    const collections = await getDocs(collection(db, group))
+  for (let i in groupNameList) {
+    const collections = await getDocs(collection(db, groupNameList[i]))
     collections.forEach((document) => {
-      console.log(document.data())
+      let keyword = document.id
+      keywordList.push(keyword)
+      result[keyword] = {}
     })
-    // let docsInCollection = collections._snapshot.docChanges
-    
-    // for(let i=0; i< docsInCollection.length; i++) {
-    //   let path = docsInCollection[i].doc.key.path.segments
-    //   let keyword = path[path.length-1]
-    //   keywordList.push(keyword)
-    //   result[keyword] = {}
-    // }
   }
+
   // 키워드 중복 제거
   keywordList = Array.from(new Set(keywordList))
 
   // 그룹 순회하며 하나씩 가져오기
-  for (let i in keywordList) {
-    const collections = await getDocs(collection(db, keywordList[i]))
-    let keyword = keywordList[i]
-    let docsInCollection = collections._snapshot.docChanges
-
-    // 해당 그룹안에 있는 docs(키워드) 순회
-    for(let i=0; i< docsInCollection.length; i++) {
-      let path = docsInCollection[i].doc.key.path.segments
-      let group = path[path.length-1]
-      let fieldsInDoc = docsInCollection[i].doc.data.value.mapValue.fields
-
-      let totalCount = fieldsInDoc.totalCount.integerValue
-      let sentencesObject = fieldsInDoc.sentences.arrayValue.values
-      let sentences = []
-      for (let i in sentencesObject) {
-        sentences.push(sentencesObject[i].stringValue)
-      }
+  for (let keyword of keywordList) {
+    const collections = await getDocs(collection(db, keyword))
+    collections.forEach((document) => {
+      let group = document.id
       result[keyword][group] = {
-        "totalCount": totalCount,
-        "sentences": sentences
+        "totalCount": document.data().totalCount,
+        "sentences": document.data().sentences
       }
-    }
+    })
   }
+  console.log(result)
   return result
 }
-
-export default { getTotalData, getGroups, getDataByGroups, getCurrentData, setData, getPassword, setPassword, updateCount }
+getCurrentData()
+export default { getTotalData, getGroups, getDataByGroups, getCurrentData, setData, getPassword, setPassword, updateCount, setGroups }
