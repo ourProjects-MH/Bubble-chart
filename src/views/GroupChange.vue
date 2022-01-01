@@ -1,22 +1,28 @@
 <template>
   <div id="app" class="container">
-    <h1>Change Your Password</h1>
+    <h1>Change Groups</h1>
     <div class="password-section">
       <div class="form-group">
-        <div class="form-title">Password</div>
+        <div class="form-title">Group</div>
         <input 
-          v-model="password" 
-          type="password" 
+          v-model="group1" 
+          type="text" 
           class="form-control" 
-          placeholder="Enter Your Current Password">
+          placeholder="Enter Group1">
         <input 
-          v-model="new_password" 
-          type="password" 
+          v-model="group2" 
+          type="text" 
           class="form-control" 
-          placeholder="Enter Your New Password">
+          placeholder="Enter Group2">
+        <input 
+          v-model="group3" 
+          type="text" 
+          class="form-control" 
+          placeholder="Enter Group3">
+        
         <div class="btn-container">
           <v-btn
-            @click="changePassword"
+            @click="changeGroups"
             dark
             color="primary"
             class="btn"
@@ -34,33 +40,27 @@ import firebase from "@/firebase.js"
 
 export default {
   name: "App",
-  
   data() {
     return {
-      authorized: false,
-      password: '',
-      new_password: '',
+      group1: '',
+      group2: '',
+      group3: '',
     }
   },
+  mounted() {
+    this.fetchGroups
+  },
   methods: {
-    changePassword() {
-      const loadpassword = firebase.getPassword()
-      loadpassword.then((res) => {
-        if (this.password === res) {
-          this.authorized = true
-          if (this.new_password.trim() === "") {
-            return alert('새로운 비밀번호를 입력해주세요.')
-          }
-          else {
-            firebase.setPassword(this.new_password)
-            console.log(this.new_password)
-            alert('변경이 완료되었습니다.')
-          }
-        }
-        else {
-          alert('비밀번호를 잘못 입력하셨습니다.')
-        }
+    fetchGroups() {
+      const loadgroups = firebase.getGroups()
+      loadgroups.then((groups) => {
+        this.group1 = groups[0]
+        this.group2 = groups[1]
+        this.group3 = groups[2]
       })
+    },
+    changeGroups() {
+      console.log('그룹 change')
     }
   }
 };

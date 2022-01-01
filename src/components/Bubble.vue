@@ -88,12 +88,14 @@ export default {
       node.append("text")
         .style("text-anchor", "middle")
         .style('font-size', this.getFontSizeForItem)
+        .on("click", this.getSentences)
         .style("font-weight", "bolder")
         .text(this.getLabel)
         .style("fill", "#ffffff")
 
       node.append("text")
         .attr("dy", "1.2em")
+        .on("click", this.getSentences)
         .style("text-anchor", "middle")
         .style('font-size', this.getFontSizeForItem)
         .text(this.getValueText)
@@ -138,7 +140,6 @@ export default {
     },
     closeModal() {
       this.modal = false
-      this.selected_keyword = null
       this.selected_sentences = null
     },
   }
@@ -162,6 +163,9 @@ export default {
 .node:hover circle {
   transform: scale(1.05);
   filter: brightness(50%);
+  cursor: pointer;
+}
+.node:hover text {
   cursor: pointer;
 }
 

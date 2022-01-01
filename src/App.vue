@@ -23,6 +23,8 @@ export default {
   src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
   font-weight: normal;
   font-style: normal;
-  unicode-range:U+AC00-U+D7A3;
+}
+* {
+  font-family: 'S-CoreDream-3Light';
 }
 </style>

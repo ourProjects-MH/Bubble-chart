@@ -15,11 +15,6 @@
           </div>
           <div class="form-group">
             <div class="form-title">Group</div>
-            <!-- <input 
-              v-model="data.group" 
-              type="text" 
-              class="form-control" 
-              placeholder="Group"> -->
             <select 
               v-model="data.group" 
               type="text" 

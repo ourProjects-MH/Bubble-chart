@@ -13,7 +13,7 @@
           color="red"
           style="margin-top: 4rem; margin-bottom: 2rem;"
         ></v-progress-circular>
-        <h3>잠시만 기다려주세요.</h3>
+        <h3>Loading...</h3>
       </div>
       <div id="bubble-chart-container">
         <Bubble 
@@ -34,7 +34,6 @@
 </template>
 
 <script>
-// import * as d3 from 'd3'
 import Header from "@/components/Header.vue"
 import Bubble from "@/components/Bubble.vue"
 import OpinionSession from "@/components/OpinionSession.vue"
@@ -75,7 +74,7 @@ export default {
             sentences.push({ 
               id: id,
               sentence_id: res[element]["sentences"][i]["id"], 
-              sentence: res[element]["sentences"][i]["sentence"], 
+              sentence: res[element]["sentences"][i]["group"] + ' - ' + res[element]["sentences"][i]["sentence"], 
               sentence_count: res[element]["sentences"][i]["count"], 
               sentence_group: res[element]["sentences"][i]["group"]
             })
@@ -90,7 +89,6 @@ export default {
       const loaddata = firebase.getDataByGroups()
       var data = []
       loaddata.then((res) => {
-        console.log(res)
         loadgroups.then((groups) => {
           this.group1 = groups[0]
           this.group2 = groups[1]

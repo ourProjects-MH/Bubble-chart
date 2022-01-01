@@ -32,7 +32,7 @@
                 text
                 icon
                 color="red lighten-2"
-                @click="likeSentence(sentence, idx)"
+                @click="likeSentence(sentence)"
               >
                 <v-icon 
                   :id="'btn-'+ String(sentence['id'])"
