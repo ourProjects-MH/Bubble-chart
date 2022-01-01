@@ -229,9 +229,10 @@ async function getGroups() {
   let groupNumber = 0
   const collections = await getDocs(collection(db, "Groups"))
   collections.forEach((document) => {
-    groups[groupNumber] = document.data().group
+    groups[groupNumber] = document.data().groupName
     groupNumber += 1
   })
+  console.log(groups)
   return groups
 }
 // getGroups()
