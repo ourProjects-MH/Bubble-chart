@@ -73,10 +73,14 @@ async function deleteOriginalData() {
 // 데이터 추가
 async function setData(dataCollection) {
   let keywords = []
-  
+  let groups = []
   // 기존 데이터 삭제
   await deleteOriginalData()
-
+  for (let i in dataCollection) {
+    groups.push(dataCollection[i]["group"])
+  }
+  await setGroups(groups)
+  
   // 그룹별로 저장
   for (let i in dataCollection) {
     
