@@ -177,13 +177,6 @@ async function getPassword () {
   return passwordDoc.data().password
 }
 
-// 그룹 데이터 저장
-async function setGroups (groups) {
-  for (let group of groups) {
-    setDoc(doc(db, "Groups", group), {"groupName": group})
-  }
-}
-
 // 그룹 가져오는 api
 async function getGroups() {
   let groups = {}
@@ -250,4 +243,4 @@ async function getCurrentData() {
   return result
 }
 
-export default { getTotalData, getGroups, getDataByGroups, getCurrentData, setData, getPassword, setPassword, updateCount, setGroups }
+export default { getTotalData, getGroups, getDataByGroups, getCurrentData, setData, getPassword, setPassword, updateCount }
