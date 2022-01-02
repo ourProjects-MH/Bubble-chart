@@ -11,7 +11,7 @@
         style="background-color: #f48120;"
       >
         <v-card-title>
-          <strong class="subheading">Get connected with us on social networks!</strong>
+          <img src="@/assets/images/Root-consulting.png" alt="" class="logo-img">
           <v-spacer></v-spacer>
           <v-btn
             v-for="icon in icons"
@@ -38,7 +38,14 @@ export default {
       'mdi-twitter',
       'mdi-linkedin',
       'mdi-instagram',
+      'mdi-export-variant',
     ],
   }),
 }
 </script>
+
+<style scoped>
+.logo-img {
+  height: 5vh;
+}
+</style>

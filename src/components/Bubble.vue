@@ -18,7 +18,7 @@ export default {
   name: "Bubble",
   data() {
     return {
-      idx: 0,
+      // idx: 0,
       max: null,
       min: null,
       modal: false,
@@ -27,7 +27,7 @@ export default {
     }
   },
   watch: {
-    children: {
+    data: {
       handler() {
         this.make_bubble()
       },
@@ -37,7 +37,7 @@ export default {
     SentenceModal,
   },
   props: {
-    children: Array,
+    data: Array,
   },
   mounted() {
     this.make_bubble()
@@ -45,12 +45,11 @@ export default {
   methods: {
     make_bubble() {
 
-      if (!this.children) {
+      if (!this.data || !this.data.length) {
         return
       } 
 
-      var json = { 'children': this.children.slice(0) }
-      // name(string), sentences(array), value(int)
+      var json = { 'children': this.data.slice(0) }
 
       const values = json.children.map(d => d.value);
 

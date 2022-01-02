@@ -155,23 +155,15 @@ export default {
 
           for (var keyword in res) {
             for (var group in res[keyword]) {
-              console.log(group)
               this.data_collections.push({
                 keyword: keyword,
                 group: group,
                 totalcount: res[keyword][group]["totalCount"],
                 sentences: res[keyword][group]["sentences"],
               })
-              console.log(this.data_collections)
             }
-            // var sentences = []
-            // for (var i in res[el]["sentences"]) {
-            //   sentences.push(res[el]["sentences"][i]["sentence"])
-            // }
           }
-
         })
-      
       })
     },
     addData () {
