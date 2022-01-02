@@ -1,20 +1,11 @@
 import { initializeApp } from "firebase/app"
 import { deleteDoc, getFirestore } from "firebase/firestore"
-// import { getDocs, collection } from "firebase/firestore"
 import { doc } from "firebase/firestore"
 import { setDoc } from "firebase/firestore"
-// import { deleteDoc } from "firebase/firestore"
 import { collection, getDocs } from "firebase/firestore";
 import {  updateDoc, getDoc, increment } from "firebase/firestore";
-initializeApp({
-  apiKey: "AIzaSyBezh5BUdyo8UCoTPkenhnBlveMZBpCgo4",
-  authDomain: "bubble-chart-2f9c3.firebaseapp.com",
-  projectId: "bubble-chart-2f9c3",
-  storageBucket: "bubble-chart-2f9c3.appspot.com",
-  messagingSenderId: "1008573436899",
-  appId: "1:1008573436899:web:3fbf6c3194bd0d1e4c46d6",
-  measurementId: "G-S5JKGNE3YX"
-});
+import firebaseConfig from '../firebaseConfig.js'
+initializeApp(firebaseConfig);
 
 const db = getFirestore();
 
@@ -26,78 +17,54 @@ async function getTotalData() {
   // 키워드별 센텐스 빈 배열 생성
   for (let i in groupNameList) {
     const collections = await getDocs(collection(db, groupNameList[i]))
-    let docsInCollection = collections._snapshot.docChanges
-
-    for(let i=0; i< docsInCollection.length; i++) {
-      let path = docsInCollection[i].doc.key.path.segments
-      let keyword = path[path.length-1]
-
+    collections.forEach((document) => {
+      let keyword = document.id
       result[keyword] = {}
       result[keyword]["sentences"] = []
-    }
+    })
   }
 
   // 키워드별 sentence 삽입 
   for (let i in groupNameList) {
     const collections = await getDocs(collection(db, groupNameList[i]))
-    
-    let docsInCollection = collections._snapshot.docChanges
-      // 해당 그룹안에 있는 docs(키워드) 순회
-    for(let i=0; i< docsInCollection.length; i++) {
-      let path = docsInCollection[i].doc.key.path.segments
-      let keyword = path[path.length-1]
 
-      let sentences = docsInCollection[i].doc.data.value.mapValue.fields
-      
-      result[keyword]["totalCount"] = await getTotalCountByKeyword(keyword)
-      
-      sentences = Object.entries(sentences)
+    let docs = collections.docs
+    for(let d=0; d<docs.length; d++) {
+      let keyword = docs[d].id
+      result[keyword]["totalCount"]  = await getTotalCountByKeyword(keyword)
 
-      for (let j=0; j<sentences.length-1; j++) {
+      let dataObject = docs[d].data()
+      for(let i in dataObject) {
+        if (i === "totalCount") continue
         let sub = {}
-        let countValue = sentences[j][1].mapValue.fields.count.integerValue
-        let group = sentences[j][1].mapValue.fields.group.stringValue
-        let sentence = sentences[j][1].mapValue.fields.sentence.stringValue
 
-        sub["sentence"] = sentence
-        sub["group"] = group
-        sub["count"] = countValue
-        sub["id"] = j
+        sub["sentence"] = dataObject[i].sentence
+        sub["group"] = dataObject[i].group
+        sub["count"] = dataObject[i].count.toString()
+        sub["id"] = parseInt(i)
         result[keyword]["sentences"].push(sub)
       }
     }
   }
   return result
 }
-getTotalData()
+
 // // 기존 데이터(키워드, 그룹) 삭제
 async function deleteOriginalData() {
   let removeList = []
   for (let word of ["Groups", "Keywords"]) {
     const collections = await getDocs(collection(db, word))
-    // collections.forEach((document) => {
-    //   removeList.push(document.id)
-    // })
-    let docsInCollection = collections._snapshot.docChanges
-  
-    for(let i=0; i< docsInCollection.length; i++) {
-      let path = docsInCollection[i].doc.key.path.segments
-      let word = path[path.length-1]
+    collections.forEach((document) => {
+      let word = document.id
       removeList.push(word)
-    }
+    })
   }
   for (let word of removeList) {
     const collections = await getDocs(collection(db, word))
-    // collections.forEach(async (document) => {
-    //   console.log(document.id)
-    //   deleteDoc(doc(db, word, document.id))
-    // })
-    let docsInCollection = collections._snapshot.docChanges
-  
-    for(let i=0; i< docsInCollection.length; i++) {
-      let path = docsInCollection[i].doc.key.path.segments
-      let docName = path[path.length-1]
-      await deleteDoc(doc(db, word, docName))
+    let docs = collections.docs
+    for(let d=0; d<docs.length; d++) {
+      let keyword = docs[d].id
+      deleteDoc(doc(db, word, keyword))
     }
   }
 }
@@ -278,5 +245,4 @@ async function getCurrentData() {
   console.log(result)
   return result
 }
-getCurrentData()
 export default { getTotalData, getGroups, getDataByGroups, getCurrentData, setData, getPassword, setPassword, updateCount, setGroups }
