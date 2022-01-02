@@ -49,7 +49,7 @@ async function getTotalData() {
   return result
 }
 
-// // 기존 데이터(키워드, 그룹) 삭제
+// 기존 데이터(키워드, 그룹) 삭제
 async function deleteOriginalData() {
   let removeList = []
   for (let word of ["Groups", "Keywords"]) {
@@ -59,6 +59,7 @@ async function deleteOriginalData() {
       removeList.push(word)
     })
   }
+  
   for (let word of removeList) {
     const collections = await getDocs(collection(db, word))
     let docs = collections.docs
@@ -72,10 +73,14 @@ async function deleteOriginalData() {
 // 데이터 추가
 async function setData(dataCollection) {
   let keywords = []
-  
+  let groups = []
   // 기존 데이터 삭제
   await deleteOriginalData()
-
+  for (let i in dataCollection) {
+    groups.push(dataCollection[i]["group"])
+  }
+  await setGroups(groups)
+  
   // 그룹별로 저장
   for (let i in dataCollection) {
     
@@ -167,17 +172,17 @@ async function getPassword () {
 
 // 그룹 데이터 저장
 async function setGroups (groups) {
-  // 원래 있던 그룹들 삭제
+  // 원래 있던 데이터 삭제
   const collections = await getDocs(collection(db, "Groups"))
   collections.forEach((document) => {
     deleteDoc(doc(db, "Groups", document.data().groupName))
   })
+
   // 들어온 그룹으로 설정
   for (let group of groups) {
     setDoc(doc(db, "Groups", group), {"groupName": group})
   }
 }
-// setGroups(["임원&실장", "중간관리자&팀장", "팀원"])
 
 // 그룹 가져오는 api
 async function getGroups() {
@@ -209,7 +214,6 @@ async function updateCount(group, keyword, sentenceId) {
     }
 
     updateDoc(doc(db, group, keyword), changeContent)
-  
 }
 
 async function getCurrentData() {
@@ -242,7 +246,7 @@ async function getCurrentData() {
       }
     })
   }
-  console.log(result)
   return result
 }
+
 export default { getTotalData, getGroups, getDataByGroups, getCurrentData, setData, getPassword, setPassword, updateCount, setGroups }
