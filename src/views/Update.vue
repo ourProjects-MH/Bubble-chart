@@ -1,124 +1,126 @@
 <template>
   <div id="app" class="container">
     <div v-if="authorized">
-      <h1>Data Collections</h1>
-      <h3>group change</h3>
-      <input 
-        v-model="group1" 
-        type="text" 
-        class="form-control" 
-        placeholder="Enter Group1">
-      <input 
-        v-model="group2" 
-        type="text" 
-        class="form-control" 
-        placeholder="Enter Group2">
-      <input 
-        v-model="group3" 
-        type="text" 
-        class="form-control" 
-        placeholder="Enter Group3">
-      <div class="section">
-        <div class="data" v-for="(data, idx) in data_collections" :key="idx">
-          <div class="idx">{{ idx+1 }}.</div>
-          <div class="form-group">
+      <h1 class="center section-title">Data Collections</h1>
+      <div class="w-80 center">
+        <h2 class="center section-title">Group Name</h2>
+        <v-row>
+          <v-col cols="4">
+            <input 
+              v-model="group1" 
+              type="text" 
+              class="w-80 outline form-control" 
+              placeholder="Enter Group1">
+          </v-col>
+          <v-col cols="4">
+            <input 
+              v-model="group2" 
+              type="text" 
+              class="w-80 outline form-control" 
+              placeholder="Enter Group2">
+          </v-col>
+          <v-col cols="4">
+            <input 
+              v-model="group3" 
+              type="text" 
+              class="w-80 outline form-control" 
+              placeholder="Enter Group3">
+          </v-col>
+        </v-row>
+      </div>
+      <div class="w-80 center">
+        <v-row class="under-line" v-for="(data, idx) in data_collections" :key="idx">
+          <v-col class="col-12">
+            <div class="idx">{{ idx+1 }}번 데이터</div>
+          </v-col>
+          <v-col class="col-4">
             <div class="form-title">Keyword</div>
             <input 
               v-model="data.keyword" 
               type="text" 
-              class="form-control" 
+              class="w-80 outline form-control" 
               placeholder="Keyword">
-          </div>
-          <div class="form-group">
+          </v-col>
+          <v-col class="col-4">
             <div class="form-title">Group</div>
             <select 
               v-model="data.group" 
               type="text" 
-              class="form-control" 
+              class="w-80 outline form-control" 
               placeholder="Group">
               <option :value="group1">{{ group1 }}</option>
               <option :value="group2">{{ group2 }}</option>
               <option :value="group3">{{ group3 }}</option>
             </select>
-          </div>
-          <div class="form-group">
+          </v-col>
+          <v-col class="col-4">
             <div class="form-title">Total Count</div>
             <input 
               v-model="data.totalcount" 
               type="text" 
-              class="form-control" 
+              class="w-80 outline form-control" 
               placeholder="Total Count">
-          </div>
-          <div class="form-group">
-            <div class="form-title">Sentences</div>
-            <input 
-              v-model="data.sentences[0]"
-              type="text" 
-              class="form-control" 
-              placeholder="First Sentence" 
-              >
-            <input 
-              v-model="data.sentences[1]" 
-              type="text" 
-              class="form-control" 
-              placeholder="Second Sentence" >
-            <input 
-              v-model="data.sentences[2]" 
-              type="text" 
-              class="form-control" 
-              placeholder="Third Sentence">
-          </div>
-          <div class="btn-container">
+          </v-col>
+          <v-col class="col-12">
+            <div class="form-group">
+              <div class="form-title">Sentences</div>
+              <input 
+                v-model="data.sentences[0]"
+                type="text" 
+                class="form-control" 
+                placeholder="First Sentence" >
+              <input 
+                v-model="data.sentences[1]" 
+                type="text" 
+                class="form-control" 
+                placeholder="Second Sentence" >
+              <input 
+                v-model="data.sentences[2]" 
+                type="text" 
+                class="form-control" 
+                placeholder="Third Sentence">
+            </div>
+          </v-col>
+          <div class="btn-container center">
             <v-btn
+              fab
               @click="removeData(idx)"
               dark
               color="error"
               class="btn"
             >
-              <v-icon left>
-                mdi-pencil
-              </v-icon>
-              Remove Data
+              <v-icon>mdi-delete</v-icon>
             </v-btn>
           </div>
-        </div>
-      </div>
-
-      <div class="btn-container">
-        <v-btn
-          @click="addData"
-          dark
-          color="success"
-          class="btn"
-        >
-          <v-icon left>
-            mdi-pencil
-          </v-icon>
-          Add Data
-        </v-btn>
-        <v-btn
-          @click="refreshData"
-          dark
-          color="success"
-          class="btn"
-        >
-          <v-icon left>
-            mdi-pencil
-          </v-icon>
-          Refresh Data
-        </v-btn>
+        </v-row>
       </div>
       <div class="btn-container">
         <v-btn
-          @click="submit"
           dark
           color="primary"
           class="btn"
+          @click="submit"
         >
-          <v-icon left>
-            mdi-pencil
-          </v-icon>
-          Save
+          <v-icon left>mdi-pencil</v-icon>
+          SAVE
+        </v-btn>
+        <v-btn
+          dark
+          color="indigo"
+          class="btn"
+          @click="addData"
+        >
+          <v-icon left>mdi-plus</v-icon>
+          NEW DATA
+        </v-btn>
+        <v-btn
+          dark
+          color="red"
+          class="btn"
+          @click="refreshData"
+        >
+          <v-icon left>mdi-delete</v-icon>
+          DELETE ALL DATA
         </v-btn>
       </div>
     </div>
@@ -127,23 +129,23 @@
       <div class="password-section">
         <div class="form-group">
           <div class="form-title">Password</div>
-          <input 
-            v-model="password" 
-            type="password" 
-            class="form-control" 
-            placeholder="Enter Password">
+            <input 
+              v-model="password" 
+              type="password" 
+              class="form-control" 
+              placeholder="Enter Password">
 
-          <div class="btn-container">
-            <v-btn
-              @click="checkPassword"
-              dark
-              color="primary"
-              class="btn"
-            >
-              Login
-            </v-btn>
-          </div>
-          <router-link :to="{name: 'PasswordChange'}">비밀번호 변경하기</router-link>
+            <div class="btn-container">
+              <v-btn
+                @click="checkPassword"
+                dark
+                color="primary"
+                class="btn"
+              >
+                Login
+              </v-btn>
+            </div>
+            <router-link :to="{name: 'PasswordChange'}">비밀번호 변경하기</router-link>
         </div>
       </div>
     </div>
@@ -167,35 +169,36 @@ export default {
     }
   },
   mounted() {
-    this.fetchData();
+    this.fetchGroup();
   },
   methods: {
-    fetchData() {
+    fetchGroup() {
       const loadgroups = firebase.getGroups()
+      loadgroups.then((groups) => {
+        this.group1 = groups[0]
+        this.group2 = groups[1]
+        this.group3 = groups[2]
+        this.fetchData()
+      })
+    },
+    fetchData() {
       const loaddata = firebase.getCurrentData()
-      
       loaddata.then((res) => {
-        loadgroups.then((groups) => {
-          this.group1 = groups[0]
-          this.group2 = groups[1]
-          this.group3 = groups[2]
-
-          for (var keyword in res) {
-            for (var group in res[keyword]) {
-              this.data_collections.push({
-                keyword: keyword,
-                group: group,
-                totalcount: res[keyword][group]["totalCount"],
-                sentences: res[keyword][group]["sentences"],
-              })
-            }
-          }
-        })
+        Object.entries(res).forEach(([keyword, keyword_data]) => {
+          Object.entries(keyword_data).forEach(([level, data]) => {
+            this.data_collections.push({
+              keyword: keyword,
+              group: level,
+              totalcount:data["totalCount"],
+              sentences: data["sentences"],
+            })
+          })
+        });
       })
     },
     addData () {
       this.data_collections.push({
-        keyword: "new keyword",
+        keyword: "",
         group: this.group1,
         totalCount: 0,
         sentences: []
@@ -208,26 +211,29 @@ export default {
       this.data_collections = []
     },
     submit () {
+      if (!this.authorized) {
+        return alert('비밀번호를 먼저 확인해주세요.')
+      }
       var data = []
-      for (var i in this.data_collections) {
-        var keyword = this.data_collections[i]["keyword"]
-        var totalCount = this.data_collections[i]["totalcount"]
-        var group = this.data_collections[i]["group"]
+      this.data_collections.forEach(element => {
+        var keyword = element["keyword"]
+        var totalCount = element["totalcount"]
+        var group = element["group"]
         var sentences = []
-        for (var s in this.data_collections[i]["sentences"]) {
-          if (this.data_collections[i]["sentences"][s]) {
-            sentences.push(this.data_collections[i]["sentences"][s])
+        element["sentences"].forEach(sentence => {
+          if (sentence) {
+            sentences.push(sentence)
           }
-        }
+        });
         data.push({
           keyword: keyword,
           group: group,
           totalCount: parseInt(totalCount),
           sentences: sentences
         })
-      }
+      });
       firebase.setData(data)
-
+      alert('변경이 완료되었습니다.')
     },
     checkPassword() {
       const loadpassword = firebase.getPassword()
@@ -245,28 +251,35 @@ export default {
 </script>
 
 <style>
-.form-group {
-  padding: 0.7rem 0;
+.w-80 {
+  width: 80%;
+  max-width: 1000px;
 }
-.form-control {
-  width: 100%;
+.outline {
   outline: 0.5px solid rgb(180, 185, 190) ;
   border-radius: 5px;
-  padding: 0.2rem 0.5rem;
+}
+.form-control {
+  padding: 0.3rem 0.5rem;
   margin: 0.2rem;
+}
+.center {
+  margin: 0 auto;
+  text-align: center;
 }
 .section {
   border-bottom: 2px solid rgb(61, 63, 65);
-  margin: 3rem;
+  padding: 2rem 0;
 }
 .password-section {
   margin: 5rem;
 }
-.data {
+.under-line {
   border-bottom: 1px solid rgb(206, 212, 218);
 }
-.form-title {
+.section-title { 
   font-weight: bold;
+  margin: 1rem;
 }
 .idx {
   margin-top: 1rem;
@@ -274,8 +287,11 @@ export default {
   font-size: 1.5rem;
 }
 .btn-container {
+  width: 100%;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-content: flex-end;
+  align-items: flex-end;
 }
 .btn {
   margin: 0 auto;
