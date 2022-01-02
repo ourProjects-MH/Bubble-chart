@@ -5,7 +5,7 @@
       <div class="center">
         <h1>2021 설문조사 결과</h1>
       </div>
-      <div v-if="!children" class="text-center">
+      <div v-if="!fetch_bubble_data" class="center">
         <v-progress-circular
           :size="100"
           :width="10"
@@ -17,14 +17,14 @@
       </div>
       <div id="bubble-chart-container">
         <Bubble 
-          :children="children" 
+          :data="bubble_data" 
           id="bubble" 
-          class="bubble" 
+          class="center" 
         />
       </div>
-      <OpinionSession 
-        v-if="opinions"
-        :opinions="opinions" 
+      <LevelChart 
+        v-if="fetch_level_data"
+        :data="level_data" 
         :group1="group1" 
         :group2="group2" 
         :group3="group3" 
@@ -36,17 +36,17 @@
 <script>
 import Header from "@/components/Header.vue"
 import Bubble from "@/components/Bubble.vue"
-import OpinionSession from "@/components/OpinionSession.vue"
+import LevelChart from "@/components/LevelChart.vue"
 import firebase from "@/firebase.js"
 
 export default {
   name: 'Main',
   data() {
     return {
-      data: {},
-      children: null,
-      bubble_size: 0,
-      opinions: null,
+      fetch_bubble_data: false,
+      fetch_level_data: false,
+      bubble_data: [],
+      level_data: [],
       group1: '',
       group2: '',
       group3: '',
@@ -55,69 +55,65 @@ export default {
   components: {
     Header,
     Bubble,
-    OpinionSession,
+    LevelChart,
   },
   mounted() {
     this.fetchBubbleData();
-    this.fetchLevelData();
+    // this.fetchBubbleData();
+    this.fetchGroupData();
   },
   methods: {
     fetchBubbleData() {
       const loaddata = firebase.getTotalData()
       loaddata.then((res) => {
-        this.children = []
-        var id = 0
-        for (var element in res) {
+        Object.entries(res).forEach(([keyword, keyword_data]) => {
           var sentences = []
-          var element_totalcount = res[element]["totalCount"]
-          for (var i in res[element]["sentences"]) {
-            sentences.push({ 
-              id: id,
-              sentence_id: res[element]["sentences"][i]["id"], 
-              sentence: res[element]["sentences"][i]["group"] + ' - ' + res[element]["sentences"][i]["sentence"], 
-              sentence_count: res[element]["sentences"][i]["count"], 
-              sentence_group: res[element]["sentences"][i]["group"]
+          keyword_data["sentences"].forEach((sentence_data) => {
+            sentences.push({
+              id: keyword + '-' + sentence_data["group"] + '-' + sentence_data["id"],
+              sentence: sentence_data["group"] + ' - ' + sentence_data["sentence"],
+              sentence_id: sentence_data["id"],
+              sentence_count: sentence_data["count"],
+              sentence_group: sentence_data["group"]
             })
-            id += 1
-          }
-          this.children.push({"name": element, "sentences": sentences, "value": element_totalcount})
-        }
+          })
+          this.bubble_data.push({"name": keyword, "sentences": sentences, "value": keyword_data["totalCount"]})
+        })
+        this.fetch_bubble_data = true
       })
     },
     fetchLevelData() {
-      const loadgroups = firebase.getGroups()
       const loaddata = firebase.getDataByGroups()
-      var data = []
       loaddata.then((res) => {
-        loadgroups.then((groups) => {
-          this.group1 = groups[0]
-          this.group2 = groups[1]
-          this.group3 = groups[2]
-          for (var keyword in res) {
-            if (res[keyword][this.group1]) {
-              var group1_rate = res[keyword][this.group1]
+        Object.entries(res).forEach(([keyword, keyword_data]) => {
+          var group1_rate = 0
+          var group2_rate = 0
+          var group3_rate = 0
+          Object.entries(keyword_data).forEach(([level, level_count]) => {
+            if (this.group1 === level) {
+              group1_rate = level_count
             }
-            else {
-              group1_rate = 0
+            if (this.group2 === level) {
+              group2_rate = level_count
             }
-            if (res[keyword][this.group2]) {
-              var group2_rate = res[keyword][this.group2]
+            if (this.group3 === level) {
+              group3_rate = level_count
             }
-            else {
-              group2_rate = 0
-            }
-            if (res[keyword][this.group3]) {
-              var group3_rate = res[keyword][this.group3]
-            }
-            else {
-              group3_rate = 0
-            }
-            data.push({"name": keyword, "group1_rate": group1_rate, "group2_rate": group2_rate, "group3_rate": group3_rate})
-          }
-          this.opinions = data
+          })
+          this.level_data.push({"name": keyword, "group1_rate": group1_rate, "group2_rate": group2_rate, "group3_rate": group3_rate})
         })
+        this.fetch_level_data = true
       })
     },
+    fetchGroupData() {
+      const loadgroups = firebase.getGroups()
+      loadgroups.then((groups) => {
+        this.group1 = groups[0]
+        this.group2 = groups[1]
+        this.group3 = groups[2]
+        this.fetchLevelData()
+      })
+    }
   }
 }
 </script>
@@ -130,6 +126,11 @@ export default {
 #bubble-chart-container {
   margin: 3rem 0;
 }
+.center {
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+}
 .bubble-chart-title {
   font-size: 2rem;
   align-self: center;
@@ -137,12 +138,5 @@ export default {
 .bubble-chart-subtitle {
   font-size: 1.3rem;
   align-self: center;
-}
-.bubble {
-  width: 100%;
-  margin: 0 auto;
-}
-.center {
-  text-align: center;
 }
 </style>

@@ -53,7 +53,6 @@ export default {
           }
           else {
             firebase.setPassword(this.new_password)
-            console.log(this.new_password)
             alert('변경이 완료되었습니다.')
           }
         }

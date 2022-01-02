@@ -14,7 +14,7 @@
       </v-card-title>
       <v-data-table
         :headers="headers"
-        :items="opinions"
+        :items="data"
         :search="search"
         hide-default-footer
       ></v-data-table>
@@ -24,9 +24,9 @@
 
 <script>
 export default {
-  name: "OpinionSession",
+  name: "LevelChart",
   props: {
-    opinions: Array,
+    data: Array,
     group1: String,
     group2: String,
     group3: String,

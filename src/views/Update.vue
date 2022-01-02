@@ -2,6 +2,22 @@
   <div id="app" class="container">
     <div v-if="authorized">
       <h1>Data Collections</h1>
+      <h3>group change</h3>
+      <input 
+        v-model="group1" 
+        type="text" 
+        class="form-control" 
+        placeholder="Enter Group1">
+      <input 
+        v-model="group2" 
+        type="text" 
+        class="form-control" 
+        placeholder="Enter Group2">
+      <input 
+        v-model="group3" 
+        type="text" 
+        class="form-control" 
+        placeholder="Enter Group3">
       <div class="section">
         <div class="data" v-for="(data, idx) in data_collections" :key="idx">
           <div class="idx">{{ idx+1 }}.</div>
@@ -80,6 +96,17 @@
           </v-icon>
           Add Data
         </v-btn>
+        <v-btn
+          @click="refreshData"
+          dark
+          color="success"
+          class="btn"
+        >
+          <v-icon left>
+            mdi-pencil
+          </v-icon>
+          Refresh Data
+        </v-btn>
       </div>
       <div class="btn-container">
         <v-btn
@@ -155,23 +182,15 @@ export default {
 
           for (var keyword in res) {
             for (var group in res[keyword]) {
-              console.log(group)
               this.data_collections.push({
                 keyword: keyword,
                 group: group,
                 totalcount: res[keyword][group]["totalCount"],
                 sentences: res[keyword][group]["sentences"],
               })
-              console.log(this.data_collections)
             }
-            // var sentences = []
-            // for (var i in res[el]["sentences"]) {
-            //   sentences.push(res[el]["sentences"][i]["sentence"])
-            // }
           }
-
         })
-      
       })
     },
     addData () {
@@ -184,6 +203,9 @@ export default {
     },
     removeData(idx) {
       this.data_collections.splice(idx, 1)
+    },
+    refreshData() {
+      this.data_collections = []
     },
     submit () {
       var data = []

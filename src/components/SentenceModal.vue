@@ -4,10 +4,11 @@
       <v-dialog
         v-model="modal"
         max-width="600"
+        @click:outside="closeModal"
+        @keydown.esc="closeModal"
       >
         <v-card>
           <div class="between">
-
           <v-card-title class="text-h5 title">
             {{ selected_keyword }}
           </v-card-title>
@@ -21,8 +22,10 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
           </div>
-
-          <v-card-text class="between no-padding-bottom" v-for="(sentence) in selected_sentences" :key="sentence['id']" >
+          <v-card-text class="between no-padding-bottom" 
+            v-for="(sentence) in selected_sentences" 
+            :key="sentence['id']" 
+          >
             <div class="align-center">
               {{ sentence["sentence"] }}
             </div>
@@ -43,10 +46,8 @@
               {{ sentence["sentence_count"] }}
             </div>
           </v-card-text>
-
           <v-card-actions>
             <v-spacer></v-spacer>
-
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -74,10 +75,8 @@ export default {
       this.$emit('closeModal')
     },
     likeSentence(data) {
-     
       var id = "btn-" + String(data['id'])
       var btn = document.getElementById(id)
-
       var group = data["sentence_group"]
       if (btn.classList.contains("mdi-heart")) {
         alert('이미 좋아요를 누르셨습니다.')
@@ -87,8 +86,6 @@ export default {
       data["sentence_count"] = parseInt(data["sentence_count"])+1
       btn.classList.remove("mdi-heart-outline")
       btn.classList += " mdi-heart"
-      console.log(group, this.selected_keyword,data, parseInt(data["sentence_id"]))
-      // btn을 x후 페이지 리렌더링을 하지 않으면 같은 인덱스 번호를 가진 btn icon이 같이 바뀜
     }
   }
 }

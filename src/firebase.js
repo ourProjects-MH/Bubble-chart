@@ -46,6 +46,7 @@ async function getTotalData() {
       }
     }
   }
+  console.log(result)
   return result
 }
 
