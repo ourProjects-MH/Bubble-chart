@@ -1,52 +1,52 @@
 <template>
   <div id="app" class="container">
     <div v-if="authorized">
-      <h1 class="center section-title">Data Collections</h1>
-      <div class="w-80 center">
-        <h2 class="center section-title">Group Name</h2>
+      <h1 class="center m-3">Data Collections</h1>
+      <div class="w-60 center pb-3 under-line">
+        <h2 class="center p-2">Group Name</h2>
         <v-row>
           <v-col cols="4">
             <input 
               v-model="group1" 
               type="text" 
-              class="w-80 outline form-control" 
+              class="w-100 outline p-1" 
               placeholder="Enter Group1">
           </v-col>
           <v-col cols="4">
             <input 
               v-model="group2" 
               type="text" 
-              class="w-80 outline form-control" 
+              class="w-100 outline p-1" 
               placeholder="Enter Group2">
           </v-col>
           <v-col cols="4">
             <input 
               v-model="group3" 
               type="text" 
-              class="w-80 outline form-control" 
+              class="w-100 outline p-1"  
               placeholder="Enter Group3">
           </v-col>
         </v-row>
       </div>
-      <div class="w-80 center">
-        <v-row class="under-line" v-for="(data, idx) in data_collections" :key="idx">
+      <div class="w-60 center">
+        <v-row class="p-2 under-line" v-for="(data, idx) in data_collections" :key="idx">
           <v-col class="col-12">
-            <div class="idx">{{ idx+1 }}번 데이터</div>
+            <h2 class="idx">{{ idx+1 }}번 데이터</h2>
           </v-col>
           <v-col class="col-4">
-            <div class="form-title">Keyword</div>
+            <h3>Keyword</h3>
             <input 
               v-model="data.keyword" 
               type="text" 
-              class="w-80 outline form-control" 
+              class="w-100 outline p-1" 
               placeholder="Keyword">
           </v-col>
           <v-col class="col-4">
-            <div class="form-title">Group</div>
+            <h3>Group</h3>
             <select 
               v-model="data.group" 
               type="text" 
-              class="w-80 outline form-control" 
+              class="w-100 outline p-1" 
               placeholder="Group">
               <option :value="group1">{{ group1 }}</option>
               <option :value="group2">{{ group2 }}</option>
@@ -54,34 +54,38 @@
             </select>
           </v-col>
           <v-col class="col-4">
-            <div class="form-title">Total Count</div>
+            <h3>Total Count</h3>
             <input 
               v-model="data.totalcount" 
               type="text" 
-              class="w-80 outline form-control" 
+              class="w-100 outline p-1" 
               placeholder="Total Count">
           </v-col>
           <v-col class="col-12">
-            <div class="form-group">
-              <div class="form-title">Sentences</div>
-              <input 
-                v-model="data.sentences[0]"
-                type="text" 
-                class="form-control" 
-                placeholder="First Sentence" >
-              <input 
-                v-model="data.sentences[1]" 
-                type="text" 
-                class="form-control" 
-                placeholder="Second Sentence" >
-              <input 
-                v-model="data.sentences[2]" 
-                type="text" 
-                class="form-control" 
-                placeholder="Third Sentence">
-            </div>
+            <h3>Sentences</h3>
+            <v-col class="col-12">
+            <input 
+              v-model="data.sentences[0]"
+              type="text" 
+              class="w-100 outline p-1" 
+              placeholder="First Sentence" >
+            </v-col>
+            <v-col class="col-12">
+            <input 
+              v-model="data.sentences[1]" 
+              type="text" 
+              class="w-100 outline p-1" 
+              placeholder="Second Sentence" >
+            </v-col>
+            <v-col class="col-12">  
+            <input 
+              v-model="data.sentences[2]" 
+              type="text" 
+              class="w-100 outline p-1" 
+              placeholder="Third Sentence">
+            </v-col>
           </v-col>
-          <div class="btn-container center">
+          <div class="center">
             <v-btn
               fab
               @click="removeData(idx)"
@@ -94,20 +98,11 @@
           </div>
         </v-row>
       </div>
-      <div class="btn-container">
-        <v-btn
-          dark
-          color="primary"
-          class="btn"
-          @click="submit"
-        >
-          <v-icon left>mdi-pencil</v-icon>
-          SAVE
-        </v-btn>
+      <div class="right m-3 absolute">
         <v-btn
           dark
           color="indigo"
-          class="btn"
+          class="btn m-1"
           @click="addData"
         >
           <v-icon left>mdi-plus</v-icon>
@@ -116,57 +111,44 @@
         <v-btn
           dark
           color="red"
-          class="btn"
+          class="btn m-1"
           @click="refreshData"
         >
           <v-icon left>mdi-delete</v-icon>
           DELETE ALL DATA
         </v-btn>
+        <v-btn
+          dark
+          color="primary"
+          class="btn m-1"
+          @click="submit"
+        >
+          <v-icon left>mdi-pencil</v-icon>
+          SAVE
+        </v-btn>
       </div>
     </div>
-    <div v-else>
-      <h1>Enter Your Password</h1>
-      <div class="password-section">
-        <div class="form-group">
-          <div class="form-title">Password</div>
-            <input 
-              v-model="password" 
-              type="password" 
-              class="form-control" 
-              placeholder="Enter Password">
-
-            <div class="btn-container">
-              <v-btn
-                @click="checkPassword"
-                dark
-                color="primary"
-                class="btn"
-              >
-                Login
-              </v-btn>
-            </div>
-            <router-link :to="{name: 'PasswordChange'}">비밀번호 변경하기</router-link>
-        </div>
-      </div>
-    </div>
+    <PasswordCheck v-else v-on:checkPassword="checkPassword" />
   </div>
 </template>
 
 <script>
 import firebase from "@/firebase.js"
+import PasswordCheck from "@/components/PasswordCheck.vue"
 
 export default {
-  name: "App",
-  
+  name: "Update",
   data() {
     return {
       authorized: false,
-      password: '',
       group1: null,
       group2: null,
       group3: null,
       data_collections: [],
     }
+  },
+  components: {
+    PasswordCheck
   },
   mounted() {
     this.fetchGroup();
@@ -214,95 +196,86 @@ export default {
       if (!this.authorized) {
         return alert('비밀번호를 먼저 확인해주세요.')
       }
-      var data = []
-      this.data_collections.forEach(element => {
-        var keyword = element["keyword"]
-        var totalCount = element["totalcount"]
-        var group = element["group"]
-        var sentences = []
-        element["sentences"].forEach(sentence => {
-          if (sentence) {
-            sentences.push(sentence)
+      else {
+        var data = []
+        var error = false
+        this.data_collections.forEach(element => {
+          var keyword = element["keyword"]
+          var totalCount = element["totalcount"]
+          var group = element["group"]
+          var sentences = []
+          if (!keyword || !totalCount || !group) {
+            error = true
           }
+          element["sentences"].forEach(sentence => {
+            if (sentence) {
+              sentences.push(sentence)
+            }
+          });
+          data.push({
+            keyword: keyword,
+            group: group,
+            totalCount: parseInt(totalCount),
+            sentences: sentences
+          })
         });
-        data.push({
-          keyword: keyword,
-          group: group,
-          totalCount: parseInt(totalCount),
-          sentences: sentences
-        })
-      });
-      firebase.setData(data)
-      alert('변경이 완료되었습니다.')
-    },
-    checkPassword() {
-      const loadpassword = firebase.getPassword()
-      loadpassword.then((res) => {
-        if (this.password === res) {
-          this.authorized = true
+        if (error) {
+          return alert('입력 데이터를 확인해주세요.')
         }
         else {
-          alert('비밀번호를 잘못 입력하셨습니다.')
+          firebase.setData(data)
+          alert('변경이 완료되었습니다.')
         }
-      })
+      }
+    },
+    checkPassword() {
+      this.authorized = true
     }
   }
 };
 </script>
 
-<style>
-.w-80 {
-  width: 80%;
+<style scoped>
+.w-100 {
+  width: 100%;
+  max-width: 1000px;
+}
+.w-60 {
+  width: 60%;
   max-width: 1000px;
 }
 .outline {
   outline: 0.5px solid rgb(180, 185, 190) ;
   border-radius: 5px;
 }
-.form-control {
-  padding: 0.3rem 0.5rem;
-  margin: 0.2rem;
-}
 .center {
   margin: 0 auto;
   text-align: center;
 }
-.section {
-  border-bottom: 2px solid rgb(61, 63, 65);
+.m-3 {
+  margin: 3rem!important;
+}
+.m-1 {
+  margin: 0.2rem;
+}
+.p-2 {
   padding: 2rem 0;
 }
-.password-section {
-  margin: 5rem;
+.p-1 {
+  padding: 0.5rem;
+}
+.pb-3 {
+  padding-bottom: 3rem !important;
 }
 .under-line {
-  border-bottom: 1px solid rgb(206, 212, 218);
+  border-bottom: 0.1rem solid rgb(168, 168, 168);
 }
-.section-title { 
-  font-weight: bold;
-  margin: 1rem;
-}
-.idx {
-  margin-top: 1rem;
-  font-weight: bold;
-  font-size: 1.5rem;
-}
-.btn-container {
-  width: 100%;
+.right {
   display: flex;
   flex-direction: column;
-  align-content: flex-end;
-  align-items: flex-end;
 }
-.btn {
-  margin: 0 auto;
-  margin-bottom: 1rem;
-}
-.password-control {
-  width: 30vw;
-  min-width: 50px;
-  max-width: 1000px;
-  outline: 0.5px solid rgb(180, 185, 190) ;
-  border-radius: 5px;
-  padding: 1rem 1rem;
+.absolute {
+  position: fixed;
+  right: 5px; bottom: 5px;
 }
 </style>

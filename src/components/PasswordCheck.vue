@@ -1,27 +1,23 @@
 <template>
   <div>
-    <h1 class="center m-3">Change Your Password</h1>
+    <h1 class="center m-3">Enter Password</h1>
     <input 
       v-model="password" 
       type="password" 
       class="password-control block center"
-      placeholder="Enter Your Current Password">
-    <input 
-      v-model="new_password" 
-      type="password" 
-      class="password-control block center"
-      placeholder="Enter Your New Password"
-      @keyup.enter="changePassword">
+      placeholder="Enter Password"
+      @keyup.enter="checkPassword">
     <div class="btn-container">
       <v-btn
-        @click="changePassword"
+        @click="checkPassword"
         dark
         color="primary"
-        class="btn"
+        class="btn block center"
       >
-        Submit
+        Login
       </v-btn>
     </div>
+    <router-link class="w-100 block center pt-1" :to="{name: 'PasswordChange'}">비밀번호 변경하기</router-link>
   </div>
 </template>
 
@@ -29,38 +25,29 @@
 import firebase from "@/firebase.js"
 
 export default {
-  name: "PasswordChange",
+  name: "Update",
   data() {
     return {
-      authorized: false,
-      password: '',
-      new_password: '',
+      password: ''
     }
   },
   methods: {
-    changePassword() {
+    checkPassword() {
       const loadpassword = firebase.getPassword()
       loadpassword.then((res) => {
         if (this.password === res) {
-          this.authorized = true
-          if (this.new_password.trim() === "") {
-            return alert('새로운 비밀번호를 입력해주세요.')
-          }
-          else {
-            firebase.setPassword(this.new_password)
-            alert('변경이 완료되었습니다.')
-          }
+          this.$emit('checkPassword')
         }
         else {
           alert('비밀번호를 잘못 입력하셨습니다.')
         }
       })
-    }
+    },
   }
-};
+}
 </script>
 
-<style>
+<style scoped>
 .password-control {
   width: 30vw;
   min-width: 50px;
@@ -83,5 +70,8 @@ export default {
 }
 .m-3 {
   margin: 3rem;
+}
+.pt-1 {
+  padding-top: 1rem;
 }
 </style>

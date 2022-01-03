@@ -3,7 +3,7 @@
     <Header />
     <div id="container">
       <div class="center">
-        <h1>2021 설문조사 결과</h1>
+        <h1 class="bold">2021 설문조사 결과</h1>
       </div>
       <div v-if="!fetch_bubble_data" class="center">
         <v-progress-circular
@@ -59,7 +59,6 @@ export default {
   },
   mounted() {
     this.fetchBubbleData();
-    // this.fetchBubbleData();
     this.fetchGroupData();
   },
   methods: {

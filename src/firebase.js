@@ -46,7 +46,6 @@ async function getTotalData() {
       }
     }
   }
-  console.log(result)
   return result
 }
 
@@ -247,7 +246,6 @@ async function getCurrentData() {
       }
     })
   }
-  console.log(result)
   return result
 }
 export default { getTotalData, getGroups, getDataByGroups, getCurrentData, setData, getPassword, setPassword, updateCount, setGroups }

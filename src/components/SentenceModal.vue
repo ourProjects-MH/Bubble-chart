@@ -1,5 +1,8 @@
 <template>
   <div>
+    <v-alert class="absolute-right-top" border="right" type="error" v-if="showalert">
+      이미 좋아요를 누르셨습니다.
+    </v-alert>
     <v-row justify="center">
       <v-dialog
         v-model="modal"
@@ -61,6 +64,7 @@ import firebase from "@/firebase.js"
 export default {
   data () {
     return {
+      showalert: false,
     }
   },
   props: {
@@ -79,13 +83,19 @@ export default {
       var btn = document.getElementById(id)
       var group = data["sentence_group"]
       if (btn.classList.contains("mdi-heart")) {
-        alert('이미 좋아요를 누르셨습니다.')
+        this.showalert = true
+        setTimeout(this.removeAlert, 3000)
         return
       }
-      firebase.updateCount(group, this.selected_keyword, parseInt(data["sentence_id"]))
-      data["sentence_count"] = parseInt(data["sentence_count"])+1
-      btn.classList.remove("mdi-heart-outline")
-      btn.classList += " mdi-heart"
+      else {
+        firebase.updateCount(group, this.selected_keyword, parseInt(data["sentence_id"]))
+        data["sentence_count"] = parseInt(data["sentence_count"])+1
+        btn.classList.remove("mdi-heart-outline")
+        btn.classList += " mdi-heart"
+      }
+    },
+    removeAlert() {
+      this.showalert = false
     }
   }
 }
@@ -106,5 +116,11 @@ export default {
 }
 .no-padding-bottom {
   padding-bottom: 0 !important;
+}
+.absolute-right-top {
+  position: fixed;
+  right: 5px;
+  top: 10px;
+  z-index: 99999;
 }
 </style>

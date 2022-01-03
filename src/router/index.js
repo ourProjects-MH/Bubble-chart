@@ -3,7 +3,6 @@ import VueRouter from 'vue-router'
 import Main from '../views/Main.vue'
 import Update from '../views/Update.vue'
 import PasswordChange from '../views/PasswordChange.vue'
-import GroupChange from '../views/GroupChange.vue'
 
 Vue.use(VueRouter)
 
@@ -22,11 +21,6 @@ const routes = [
     path: '/changepassword',
     name: 'PasswordChange',
     component: PasswordChange
-  },
-  {
-    path: '/changegroup',
-    name: 'GroupChange',
-    component: GroupChange
   },
 ]
 

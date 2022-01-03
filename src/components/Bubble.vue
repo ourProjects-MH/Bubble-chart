@@ -18,7 +18,6 @@ export default {
   name: "Bubble",
   data() {
     return {
-      // idx: 0,
       max: null,
       min: null,
       modal: false,
@@ -49,56 +48,60 @@ export default {
         return
       } 
 
-      var json = { 'children': this.data.slice(0) }
+      else {
+  
+        var json = { 'children': this.data.slice(0) }
+  
+        const values = json.children.map(d => d.value);
+  
+        this.min = Math.min.apply(null, values);
+        this.max = Math.max.apply(null, values);
+  
+        const diameter = 600;
+  
+        var bubble = d3.pack()
+          .size([diameter, diameter])
+          .padding(15);
+        
+        var svg = d3.select('#chart').append('svg')
+          .attr('width', diameter)
+          .attr('height', diameter)
+  
+        var root = d3.hierarchy(json)
+          .sum(function(d) { return d.value; });
+  
+        bubble(root);
+  
+        var node = svg.selectAll('.node')
+          .data(root.children)
+          .enter()
+          .append('g')
+          .attr('class', 'node')
+          .attr('transform', function(d) { return 'translate(' + d.x + ' ' + d.y + ')'; })
+          .append('g');
+  
+        node.append("circle")
+          .attr("r", function(d) { return d.r; })
+          .on("click", this.getSentences)
+          .style("fill", this.getItemColor)
+  
+        node.append("text")
+          .style("text-anchor", "middle")
+          .style('font-size', this.getFontSizeForItem)
+          .on("click", this.getSentences)
+          .style("font-weight", "bolder")
+          .text(this.getLabel)
+          .style("fill", "#ffffff")
+  
+        node.append("text")
+          .attr("dy", "1.2em")
+          .on("click", this.getSentences)
+          .style("text-anchor", "middle")
+          .style('font-size', this.getFontSizeForItem)
+          .text(this.getValueText)
+          .style("fill", "#ffffff")
 
-      const values = json.children.map(d => d.value);
-
-      this.min = Math.min.apply(null, values);
-      this.max = Math.max.apply(null, values);
-
-      const diameter = 600;
-
-      var bubble = d3.pack()
-        .size([diameter, diameter])
-        .padding(15);
-      
-      var svg = d3.select('#chart').append('svg')
-        .attr('width', diameter)
-        .attr('height', diameter)
-
-      var root = d3.hierarchy(json)
-        .sum(function(d) { return d.value; });
-
-      bubble(root);
-
-      var node = svg.selectAll('.node')
-        .data(root.children)
-        .enter()
-        .append('g')
-        .attr('class', 'node')
-        .attr('transform', function(d) { return 'translate(' + d.x + ' ' + d.y + ')'; })
-        .append('g');
-
-      node.append("circle")
-        .attr("r", function(d) { return d.r; })
-        .on("click", this.getSentences)
-        .style("fill", this.getItemColor)
-
-      node.append("text")
-        .style("text-anchor", "middle")
-        .style('font-size', this.getFontSizeForItem)
-        .on("click", this.getSentences)
-        .style("font-weight", "bolder")
-        .text(this.getLabel)
-        .style("fill", "#ffffff")
-
-      node.append("text")
-        .attr("dy", "1.2em")
-        .on("click", this.getSentences)
-        .style("text-anchor", "middle")
-        .style('font-size', this.getFontSizeForItem)
-        .text(this.getValueText)
-        .style("fill", "#ffffff")
+      }
     },
     getLabel(item) {
       return this.truncate(item.data.name);
@@ -123,10 +126,6 @@ export default {
       return `${size}px`;
     },
     getItemColor() {
-      // const colorList = ["#FCE4C5", "#F89928", "#FDDEB5"];
-      // const color_length = colorList.length
-      // var i = this.idx % color_length
-      // this.idx += 1
       return "#f48120";
     },
     getSentences(item) {
@@ -139,6 +138,7 @@ export default {
     },
     closeModal() {
       this.modal = false
+      this.selected_keyword = null
       this.selected_sentences = null
     },
   }
