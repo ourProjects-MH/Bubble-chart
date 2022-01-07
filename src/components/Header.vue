@@ -14,47 +14,39 @@
         style="background-color: #f48120;"
       >
         <v-card-title>
-          <img src="@/assets/images/Root-consulting.png" alt="" class="logo-img">
+          <img src="@/assets/images/Root-consulting.png" alt="RootConsulting" class="logo-img">
           <v-spacer></v-spacer>
           <v-btn
-            class="mx-4"
+            class="mx-2"
             dark
             icon
             @click="openLink('facebook')"
           >
-            <v-icon size="24px">
-              mdi-facebook
-            </v-icon>
+            <img src="@/assets/images/facebook.png" alt="facebook link" class="sns-img">
           </v-btn>
           <v-btn
-            class="mx-4"
+            class="mx-2"
             dark
             icon
             @click="openLink('instagram')"
           >
-            <v-icon size="24px">
-              mdi-instagram
-            </v-icon>
+            <img src="@/assets/images/instagram.png" alt="instagram link" class="sns-img">
           </v-btn>
           <v-btn
-            class="mx-4"
+            class="mx-2"
             dark
             icon
             @click="openLink(naverblog)"
           >
-            <v-icon size="24px">
-              mdi-note-text
-            </v-icon>
+            <img src="@/assets/images/naverblog.png" alt="naverblog link" class="sns-img">
           </v-btn>
           <v-btn
-            class="mx-4"
+            class="mx-2"
             dark
             icon
             @click="copyLink"
           >
-            <v-icon size="24px">
-              mdi-export-variant
-            </v-icon>
+            <img src="@/assets/images/copylink.png" alt="copy url" class="sns-img">
           </v-btn>
         </v-card-title>
       </v-card>
@@ -102,6 +94,9 @@ export default {
 
 <style scoped>
 .logo-img {
+  height: 5vh;
+}
+.sns-img {
   height: 5vh;
 }
 .absolute-right-top {
